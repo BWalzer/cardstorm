@@ -1,0 +1,10 @@
+Ideas to think about:
+    - consider cmc in the recommendations. recommend less higher cmc cards
+    - don't recommend outside of established deck colors
+    - don't recommend mana only lands (only utility and man lands)
+    - display info on deck statistics: cmc distribution, color distrubution
+        (see tappedout.net for some ideas)
+    - categorize cards by their role, i.e, single target creature removal,
+        counterspellst, card advantage, etc.
+    - be able to upload deck lists in text format
+    -
