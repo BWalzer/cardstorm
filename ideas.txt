@@ -1,10 +1,19 @@
 Ideas to think about:
     - consider cmc in the recommendations. recommend less higher cmc cards
+        - this may be taken care of automatically by the recommender. If other decks don't play many high cmc cards,
+            it won't recommend high cmc cards.
     - don't recommend outside of established deck colors
+        - filter after recommendations are made
     - don't recommend mana only lands (only utility and man lands)
+        -filter after recommendations are made
     - display info on deck statistics: cmc distribution, color distrubution
         (see tappedout.net for some ideas)
     - categorize cards by their role, i.e, single target creature removal,
         counterspellst, card advantage, etc.
+        - Matt's idea. Quick description of a card, i.e, if the model recommends Lightning Bolt, explain that Lightning Bolt
+            is a cheap removal spell
     - be able to upload deck lists in text format
-    -
+    
+    
+    - Update training decks weekly, maybe monday or tuesday night? Most events are on the weekend
+    - 
