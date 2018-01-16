@@ -69,9 +69,12 @@ def make_user_card_counts_2(front_pages=[0], verbose=False):
     in a data base.
 
     INPUT:
-
-
+        - front_pages: list of integers for each front page to request. Each 
+                       value in the list will get 10 events. Default value: [0]
+        - verbose: boolean indicating if status messages are printed to the
+                   console. Default value: False
     OUTPUT:
+        NONE
 
     Request front page
     Get event ids
