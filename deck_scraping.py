@@ -2,10 +2,9 @@ import requests
 import re
 import random
 import time
-import pickle
 from bs4 import BeautifulSoup
 
-def get_event_ids(front_page):
+def get_event_ids(front_page, verbose=False):
     """
     Takes in a front page of mtgtop8.com and returns a list of
         the event ids
@@ -17,7 +16,7 @@ def get_event_ids(front_page):
         - event_ids: a list of all the event ids from the 'Last 10 Events' table
     """
 
-    print('\tGetting event ids from a front page')
+    if verbose: print('\tGetting event ids from a front page')
 
     event_list = [event['href'] for event in front_page.find_all('table')[2]
          .find('td').find_next_sibling().find_all('table')[1].find_all('a')]
@@ -28,7 +27,7 @@ def get_event_ids(front_page):
 
     return event_ids
 
-def get_all_event_ids(front_pages):
+def get_all_event_ids(front_pages, verbose=False):
     """
     Takes in a list of front pages of mtgtop8.com and returns a list of all
         the event ids
@@ -42,12 +41,12 @@ def get_all_event_ids(front_pages):
 
     all_event_ids = set()
     for front_page in front_pages:
-        event_ids = get_event_ids(front_page)
+        event_ids = get_event_ids(front_page, verbose=verbose)
         all_event_ids.update(event_ids)
 
     return all_event_ids
 
-def get_deck_ids(event_page):
+def get_deck_ids(event_page, verbose=False):
     """Takes in an event page and returns a list of all the deck ids on that page.
 
     INPUT:
@@ -72,7 +71,7 @@ def get_deck_ids(event_page):
 
     return deck_ids
 
-def deck_request(deck_id):
+def deck_request(deck_id, verbose=False):
     """Takes a deck_id and returns the response from the request. Errors will come later.
 
     INPUT:
@@ -82,7 +81,7 @@ def deck_request(deck_id):
         - deck_list: a list of strings representing the deck list corresponding
                      to the deck_id."""
 
-    print('\t\tDeck request for deck id {}'.format(deck_id))
+    if verbose: print('\t\tDeck request for deck id {}'.format(deck_id))
     response = requests.get('http://mtgtop8.com/mtgo?d={}'.format(deck_id),
                             headers={'User-Agent': 'Getting some deck lists'})
 
@@ -94,7 +93,7 @@ def deck_request(deck_id):
     # FUTURE WORK: check the status code
     return deck_list
 
-def deck_requests(deck_ids):
+def deck_requests(deck_ids, verbose=False):
     """Takes a set of deck ids and returns the responses from the requests. Errors will come later.
 
     INPUT:
@@ -104,14 +103,19 @@ def deck_requests(deck_ids):
         - deck_lists: a dictionary with key=deck_id and value=deck_list"""
 
     deck_lists = {}
+    counter = 1
+    end = len(deck_ids)
     for deck_id in deck_ids:
-        deck_list = deck_request(deck_id)
+        if verbose: print('Deck request {} of {}'.format(counter, end))
+        deck_list = deck_request(deck_id, verbose=verbose)
         deck_lists[deck_id] = deck_list
+
+        counter += 1
 
     # FUTURE WORK: check the status code
     return deck_lists
 
-def event_request(event_id):
+def event_request(event_id, verbose=False):
     """Takes an event_id and returns the response from the request. Errors will come later.
 
     INPUT:
@@ -120,7 +124,7 @@ def event_request(event_id):
     OUTPUT:
         - response: the response from the get request"""
 
-    print('\t\tEvent request for event id {}'.format(event_id))
+    if verbose: print('\t\tEvent request for event id {}'.format(event_id))
     response = requests.get('http://mtgtop8.com/event?e={}'.format(event_id),
                             headers={'User-Agent': 'Getting some event info'})
 
@@ -130,7 +134,7 @@ def event_request(event_id):
     # FUTURE WORK: check the status code
     return response
 
-def event_requests(event_ids):
+def event_requests(event_ids, verbose=False):
     """
     Takes a list of event ids and returns a list of BeautifulSoup objects of
     the responses from the requests. Errors will come later.
@@ -152,7 +156,7 @@ def event_requests(event_ids):
     # FUTURE WORK: check the status code
     return event_pages
 
-def modern_front_page_request(page_number=0):
+def modern_front_page_request(page_number=0, verbose=False):
     """Sends a get request to mtgtop8.com with the given page number
 
     INPUT:
@@ -162,7 +166,7 @@ def modern_front_page_request(page_number=0):
     OUTPUT:
         - response: the response from the get request"""
 
-    print('\tRequesting front page number {}'.format(page_number))
+    if verbose: print('\tRequesting front page number {}'.format(page_number))
 
     response = requests.get('http://mtgtop8.com/format?f=MO&meta=44&cp={}'.format(page_number),
                             headers={'User-Agent': 'Modern front page request'})
@@ -173,7 +177,7 @@ def modern_front_page_request(page_number=0):
     # FUTURE WORK: check the status code
     return response
 
-def modern_front_page_requests(page_numbers=[0]):
+def modern_front_page_requests(page_numbers=[0], verbose=False):
     """
     Sends a get request to get the modern front page from mtgtop8.com. One
         request is made for each value in page_numbers.
@@ -189,14 +193,14 @@ def modern_front_page_requests(page_numbers=[0]):
 
     front_pages = []
     for page_number in page_numbers:
-        response = modern_front_page_request(page_number)
+        response = modern_front_page_request(page_number, verbose=verbose)
         front_page = BeautifulSoup(response.text, 'html.parser')
         front_pages.append(front_page)
 
     # FUTURE WORK: check the status code
     return front_pages
 
-def get_deck_lists(event_ids):
+def get_deck_lists(event_ids, verbose=False):
     """
     Takes a list of event ids, sends get requests to mtgtop8.com for each event
         id and pulls the deck ids from the event page. Once it has all the deck
@@ -215,19 +219,22 @@ def get_deck_lists(event_ids):
 
     deck_ids = set()
     for event_id in event_ids:
+
+
         # send a get request to for the event page, and load it into a BS
-        event_page = BeautifulSoup(event_request(event_id).text, 'html.parser')
+        event_page = BeautifulSoup(event_request(event_id).text, 'html.parser',
+                                                            verbose=verbose)
 
         # update the set of deck ids with result from get_deck_ids()
-        deck_ids.update(get_deck_ids(event_page))
+        deck_ids.update(get_deck_ids(event_page, verbose=verbose))
 
     # get a deck list for each deck id, in a dictionary with key=deck_id and
     # value=deck list
-    deck_lists = deck_requests(deck_ids)
+    deck_lists = deck_requests(deck_ids, verbose=verbose)
 
     return deck_lists
 
-def scrape_deck_lists():
+def scrape_deck_lists(page_numbers=[0], verbose=False):
     """
     Does the entire web scraping process. Requests the front page of
 
@@ -239,16 +246,17 @@ def scrape_deck_lists():
     """
 
     # get the modern page with the first 10 events
-    print('Requesting the front pages')
-    front_pages = modern_front_page_requests(range(10)) # leaving page_numbers blank for now
+    if verbose: print('Requesting the front pages')
+    front_pages = modern_front_page_requests(page_numbers=page_numbers,
+                                                verbose=verbose)
 
     # get the event ids from the page with the first 10 events
-    print('Getting all event ids')
-    event_ids = get_all_event_ids(front_pages)
+    if verbose: print('Getting all event ids')
+    event_ids = get_all_event_ids(front_pages, verbose=verbose)
 
     # using event ids, get a set of deck lists
-    print('Getting deck lists')
-    deck_lists = get_deck_lists(event_ids)
+    if verbose: print('Getting deck lists')
+    deck_lists = get_deck_lists(event_ids, verbose=verbose)
 
     return deck_lists
 
@@ -259,7 +267,3 @@ if __name__ == '__main__':
 
     print('{} decks scraped! Duration: {}'.format(len(deck_lists),
                                             end_time - start_time))
-
-
-    pickle.dump(deck_lists, open('deck_lists', 'bw'))
-    print('Deck lists pickled!')
