@@ -64,7 +64,7 @@ def decklist_deconstructor(deck_id, deck_list):
 #
 #     return flatten(user_card_counts)
 
-def make_user_card_counts(front_pages=[0], scraped_events, verbose=False):
+def scrape_decklists(scraped_events, front_pages=[0], verbose=False):
     """
     Version 2. Creates the user_card_count pairs from deck lists and stores them
     in a data base.
@@ -72,24 +72,10 @@ def make_user_card_counts(front_pages=[0], scraped_events, verbose=False):
     INPUT:
         - front_pages: list of integers for each front page to request. Each
                        value in the list will get 10 events. Default value: [0]
-        - scraped_events: a set of event ids for events that have already been
-                          scraped. Events with these ids will not be scraped again.
         - verbose: boolean indicating if status messages are printed to the
                    console. Default value: False
     OUTPUT:
-        - scraped_events: a set of event ids for events that have already been
-                          scraped. Events with these ids will not be scraped again.
-                          Events scraped during this function will be added.
-
-    Request front page
-    Get event ids
-    Request event
-    Get deck ids
-    Request deck
-    Process deck
-    Store user-card-count pairs in db
-        Amazon RDS
-        PostgreSQL
+        NONE
     """
 
     for page_number in front_pages:
@@ -101,8 +87,8 @@ def make_user_card_counts(front_pages=[0], scraped_events, verbose=False):
 
         for event_id in event_ids:
             if event_id in scraped_events:
-                if verbose: print('event id {} has already been scraped'.format(event_id))
-                break
+                if verbose: print('\t\tevent id {} already scraped'.format(event_id))
+                continue
             event_page = deck_scraping.event_request(event_id=event_id,
                                                     verbose=verbose)
             event_page_soup = BeautifulSoup(event_page.text, 'html.parser')
@@ -111,14 +97,12 @@ def make_user_card_counts(front_pages=[0], scraped_events, verbose=False):
             for deck_id in deck_ids:
                 deck_list = deck_scraping.deck_request(deck_id=deck_id,
                                                        verbose=verbose)
-                # saving decklists as text files
                 save_decklists(deck_id, deck_list)
 
             scraped_events.add(event_id)
 
     return scraped_events
-
-
+    
 def save_decklists(deck_id, deck_list):
     """
     Saves a deck list as a text file in my s3 bucket.
@@ -137,17 +121,14 @@ def save_decklists(deck_id, deck_list):
     #
     # s3.put_object(Bucket=bucketname, Key=filename, Body=deck_list)
 
+    print('\t\t\tSaved deck!')
 
-    print('\t\tSaved deck!')
 
 if __name__ == '__main__':
     with open('../data/scraped_events.json', 'r') as f:
         scraped_events = set(json.load(f))
 
-    print('Scraped events: {}'.format(scraped_events))
-    updated_scraped_events = make_user_card_counts(front_pages=[0],
-                                  scraped_events = scraped_events, verbose=True)
+    updated_scraped_events = make_user_card_counts(scraped_events = scraped_events, verbose=True)
 
-    print('Updated scraped events: {}'.format(updated_scraped_events))
-    with open('../data/scraped_events.json', 'w') as f:
+    with open ('../data/scraped_events.json', 'w') as f:
         json.dump(list(updated_scraped_events), f)

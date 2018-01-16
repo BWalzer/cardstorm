@@ -1,10 +1,10 @@
 import requests
 import re
+import json
 import random
 import time
 from bs4 import BeautifulSoup
 
-# used in make_user_card_counts_2
 def get_event_ids(front_page, verbose=False):
     """
     Takes in a front page of mtgtop8.com and returns a list of
@@ -28,26 +28,6 @@ def get_event_ids(front_page, verbose=False):
 
     return event_ids
 
-# def get_all_event_ids(front_pages, verbose=False):
-#     """
-#     Takes in a list of front pages of mtgtop8.com and returns a list of all
-#         the event ids
-#
-#     INPUT:
-#         - front_pages: a list of BeautifulSoup object of the event page
-#
-#     OUTPUT:
-#         - all_event_ids: a set of all the event ids from the 'Last 10 Events' table
-#     """
-#
-#     all_event_ids = set()
-#     for front_page in front_pages:
-#         event_ids = get_event_ids(front_page, verbose=verbose)
-#         all_event_ids.update(event_ids)
-#
-#     return all_event_ids
-
-# used in make_user_card_counts_2
 def get_deck_ids(event_page, verbose=False):
     """Takes in an event page and returns a list of all the deck ids on that page.
 
@@ -73,7 +53,6 @@ def get_deck_ids(event_page, verbose=False):
 
     return deck_ids
 
-# used in make_user_card_counts_2
 def deck_request(deck_id, verbose=False):
     """Takes a deck_id and returns the response from the request. Errors will come later.
 
@@ -101,33 +80,10 @@ def deck_request(deck_id, verbose=False):
 
             if verbose: print('bad status code: {}. try {} of 5'.format(response.status_code, i+1))
 
-    deck_list = response.text.split('\r\n')
+    deck_list = response.content
 
     return deck_list
 
-# def deck_requests(deck_ids, verbose=False):
-#     """Takes a set of deck ids and returns the responses from the requests. Errors will come later.
-#
-#     INPUT:
-#         - deck_ids: the set of unique ids for each ofthe desired deck lists from mtgtop8.com
-#
-#     OUTPUT:
-#         - deck_lists: a dictionary with key=deck_id and value=deck_list"""
-#
-#     deck_lists = {}
-#     counter = 1
-#     end = len(deck_ids)
-#     for deck_id in deck_ids:
-#         if verbose: print('Deck request {} of {}'.format(counter, end))
-#         deck_list = deck_request(deck_id, verbose=verbose)
-#         deck_lists[deck_id] = deck_list
-#
-#         counter += 1
-#
-#     # FUTURE WORK: check the status code
-#     return deck_lists
-
-# used in make_user_card_counts_2
 def event_request(event_id, verbose=False):
     """Takes an event_id and returns the response from the request. Errors will come later.
 
@@ -156,29 +112,6 @@ def event_request(event_id, verbose=False):
 
     return response
 
-# def event_requests(event_ids, verbose=False):
-#     """
-#     Takes a list of event ids and returns a list of BeautifulSoup objects of
-#     the responses from the requests. Errors will come later.
-#
-#     INPUT:
-#         - event_ids: the list of unique ids for the desired events from
-#                      mtgtop8.com
-#
-#     OUTPUT:
-#         - event_pages: the list of BeautifulSoup objects of the responses from
-#                        the get requests
-#     """
-#
-#     event_pages = []
-#     for event_id in event_ids:
-#         event_page = BeautifulSoup(event_request(event_id).text, 'html.parser')
-#         event_pages.append(event_page)
-#
-#     # FUTURE WORK: check the status code
-#     return event_pages
-
-# used in make_user_card_counts_2
 def modern_front_page_request(page_number=0, verbose=False):
     """Sends a get request to mtgtop8.com with the given page number
 
@@ -208,29 +141,6 @@ def modern_front_page_request(page_number=0, verbose=False):
         if verbose: print('bad status code: {}. try {} of 5'.format(response.status_code, i+1))
 
     return response
-
-# def modern_front_page_requests(page_numbers=[0], verbose=False):
-#     """
-#     Sends a get request to get the modern front page from mtgtop8.com. One
-#         request is made for each value in page_numbers.
-#
-#     INPUT:
-#         - page_numbers: a list of values for 'cp' in the get request to mtgtop8.
-#                         Default value of [0].
-#
-#     OUTPUT:
-#         - front_pages: a list of BeautifulSoup objects for each of the modern
-#                        front pages.
-#     """
-#
-#     front_pages = []
-#     for page_number in page_numbers:
-#         response = modern_front_page_request(page_number, verbose=verbose)
-#         front_page = BeautifulSoup(response.text, 'html.parser')
-#         front_pages.append(front_page)
-#
-#     # FUTURE WORK: check the status code
-#     return front_pages
 
 def get_deck_lists(event_ids, verbose=False):
     """
@@ -266,36 +176,74 @@ def get_deck_lists(event_ids, verbose=False):
 
     return deck_lists
 
-# def scrape_deck_lists(page_numbers=[0], verbose=False):
-#     """
-#     Does the entire web scraping process. Requests the front page of
-#
-#     INPUT: NONE
-#
-#     OUTPUT:
-#         - deck_lists: a dictionary of deck lists with key=deck_id and
-#                       value=deck_list
-#     """
-#
-#     # get the modern page with the first 10 events
-#     if verbose: print('Requesting the front pages')
-#     front_pages = modern_front_page_requests(page_numbers=page_numbers,
-#                                                 verbose=verbose)
-#
-#     # get the event ids from the page with the first 10 events
-#     if verbose: print('Getting all event ids')
-#     event_ids = get_all_event_ids(front_pages, verbose=verbose)
-#
-#     # using event ids, get a set of deck lists
-#     if verbose: print('Getting deck lists')
-#     deck_lists = get_deck_lists(event_ids, verbose=verbose)
-#
-#     return deck_lists
-#
-# if __name__ == '__main__':
-#     start_time = time.time()
-#     deck_lists = scrape_deck_lists()
-#     end_time = time.time()
-#
-#     print('{} decks scraped! Duration: {}'.format(len(deck_lists),
-#                                             end_time - start_time))
+def scrape_decklists(scraped_events, front_pages=[0], verbose=False):
+    """
+    Version 2. Scrapes mtgtop8.com for modern deck lists.
+
+    INPUT:
+        - front_pages: list of integers for each front page to request. Each
+                       value in the list will get 10 events. Default value: [0]
+        - scraped_events: a set of all previously scraped event_ids. These
+                          event_ids will not be re-scraped.
+        - verbose: boolean indicating if status messages are printed to the
+                   console. Default value: False
+    OUTPUT:
+        - scraped_events: a set of event_ids which have been scraped. updated.
+    """
+
+    for page_number in front_pages:
+        front_page = modern_front_page_request(
+                                       page_number=page_number, verbose=verbose)
+        front_page_soup = BeautifulSoup(front_page.text, 'html.parser')
+        event_ids = get_event_ids(front_page=front_page_soup,
+                                                verbose=verbose)
+
+        for event_id in event_ids:
+            if event_id in scraped_events:
+                if verbose: print('\t\tevent id {} already scraped'.format(event_id))
+                continue
+            event_page = event_request(event_id=event_id,
+                                                    verbose=verbose)
+            event_page_soup = BeautifulSoup(event_page.text, 'html.parser')
+            deck_ids = get_deck_ids(event_page=event_page_soup,
+                                                  verbose=verbose)
+            for deck_id in deck_ids:
+                deck_list = deck_request(deck_id=deck_id,
+                                                       verbose=verbose)
+                save_decklists(deck_id, deck_list, verbose=verbose)
+
+            scraped_events.add(event_id)
+
+    return scraped_events
+
+def save_decklists(deck_id, deck_list, verbose=False):
+    """
+    Saves a deck list as a text file in my s3 bucket.
+
+    INPUT:
+        - deck_id: the unique id for the deck list
+        - deck_list: the deck list to be saved in the s3 bucket.
+
+    OUTPUT:
+        NONE
+    """
+
+    # s3 = boto3.client('s3')
+    # bucketname = 'mtg-capstone'
+    # filename = 'data/raw_deck_lists/deck_list_{}.txt'.format(deck_id)
+    #
+    # s3.put_object(Bucket=bucketname, Key=filename, Body=deck_list)
+    # if verbose: print('\t\t\tsaved deck in s3 bucket')
+
+    if verbose: print('\t\t\tSaved deck!')
+
+
+if __name__ == '__main__':
+    with open('../data/scraped_events.json', 'r') as f:
+        scraped_events = set(json.load(f))
+
+    updated_scraped_events = scrape_decklists(scraped_events=scraped_events,
+                                              front_pages=range(1),
+                                              verbose=True)
+    with open('../data/scraped_events.json', 'w') as f:
+        json.dump(list(updated_scraped_events), f)
