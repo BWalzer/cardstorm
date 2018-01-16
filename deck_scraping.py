@@ -4,6 +4,7 @@ import random
 import time
 from bs4 import BeautifulSoup
 
+# used in make_user_card_counts_2
 def get_event_ids(front_page, verbose=False):
     """
     Takes in a front page of mtgtop8.com and returns a list of
@@ -46,6 +47,7 @@ def get_all_event_ids(front_pages, verbose=False):
 
     return all_event_ids
 
+# used in make_user_card_counts_2
 def get_deck_ids(event_page, verbose=False):
     """Takes in an event page and returns a list of all the deck ids on that page.
 
@@ -71,6 +73,7 @@ def get_deck_ids(event_page, verbose=False):
 
     return deck_ids
 
+# used in make_user_card_counts_2
 def deck_request(deck_id, verbose=False):
     """Takes a deck_id and returns the response from the request. Errors will come later.
 
@@ -82,15 +85,24 @@ def deck_request(deck_id, verbose=False):
                      to the deck_id."""
 
     if verbose: print('\t\tDeck request for deck id {}'.format(deck_id))
-    response = requests.get('http://mtgtop8.com/mtgo?d={}'.format(deck_id),
-                            headers={'User-Agent': 'Getting some deck lists'})
+
+    # repeat this process a max of 5 times. If status_code==200, break
+    for i in range(5):
+        response = requests.get('http://mtgtop8.com/mtgo?d={}'.format(deck_id),
+                                headers={'User-Agent': 'Getting some deck lists'})
+
+        # preventing submitting too fast
+        time.sleep(2 + random.random())
+
+        # if good status code, quit loop and return
+        # otherwise, keep going for a max of 5 times
+        if response.status_code == 200:
+            if verbose: print('bad status code: {}. try {} of 5'.format(
+                                            reponse.status_code, i))
+            break
 
     deck_list = response.text.split('\r\n')
 
-    # preventing submitting too fast
-    time.sleep(2 + random.random())
-
-    # FUTURE WORK: check the status code
     return deck_list
 
 def deck_requests(deck_ids, verbose=False):
@@ -115,6 +127,7 @@ def deck_requests(deck_ids, verbose=False):
     # FUTURE WORK: check the status code
     return deck_lists
 
+# used in make_user_card_counts_2
 def event_request(event_id, verbose=False):
     """Takes an event_id and returns the response from the request. Errors will come later.
 
@@ -125,13 +138,22 @@ def event_request(event_id, verbose=False):
         - response: the response from the get request"""
 
     if verbose: print('\t\tEvent request for event id {}'.format(event_id))
-    response = requests.get('http://mtgtop8.com/event?e={}'.format(event_id),
-                            headers={'User-Agent': 'Getting some event info'})
 
-    # preventing submitting too fast
-    time.sleep(2 + random.random())
+    # repeat this process a max of 5 times. If status_code==200, break
+    for i in range(5):
+        response = requests.get('http://mtgtop8.com/event?e={}'.format(event_id),
+                                headers={'User-Agent': 'Getting some event info'})
 
-    # FUTURE WORK: check the status code
+        # preventing submitting too fast
+        time.sleep(2 + random.random())
+
+        # if good status code, quit loop and return
+        # otherwise, keep going for a max of 5 times
+        if response.status_code == 200:
+            if verbose: print('bad status code: {}. try {} of 5'.format(
+                                                reponse.status_code, i))
+            break
+
     return response
 
 def event_requests(event_ids, verbose=False):
@@ -156,6 +178,7 @@ def event_requests(event_ids, verbose=False):
     # FUTURE WORK: check the status code
     return event_pages
 
+# used in make_user_card_counts_2
 def modern_front_page_request(page_number=0, verbose=False):
     """Sends a get request to mtgtop8.com with the given page number
 
@@ -166,15 +189,24 @@ def modern_front_page_request(page_number=0, verbose=False):
     OUTPUT:
         - response: the response from the get request"""
 
+    # repeat this process a max of 5 times. If status_code==200, break
     if verbose: print('\tRequesting front page number {}'.format(page_number))
 
-    response = requests.get('http://mtgtop8.com/format?f=MO&meta=44&cp={}'.format(page_number),
-                            headers={'User-Agent': 'Modern front page request'})
+
+    for i in range(5):
+        response = requests.get('http://mtgtop8.com/format?f=MO&meta=44&cp={}'.format(page_number),
+                                headers={'User-Agent': 'Modern front page request'})
 
 
-    time.sleep(2 + random.random())
+        time.sleep(2 + random.random())
 
-    # FUTURE WORK: check the status code
+        # if good status code, quit loop and return
+        # otherwise, keep going for a max of 5 times
+        if response.status_code == 200:
+            if verbose: print('bad status code: {}. try {} of 5'.format(
+                                            reponse.status_code, i))
+            break
+
     return response
 
 def modern_front_page_requests(page_numbers=[0], verbose=False):
