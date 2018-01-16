@@ -28,24 +28,24 @@ def get_event_ids(front_page, verbose=False):
 
     return event_ids
 
-def get_all_event_ids(front_pages, verbose=False):
-    """
-    Takes in a list of front pages of mtgtop8.com and returns a list of all
-        the event ids
-
-    INPUT:
-        - front_pages: a list of BeautifulSoup object of the event page
-
-    OUTPUT:
-        - all_event_ids: a set of all the event ids from the 'Last 10 Events' table
-    """
-
-    all_event_ids = set()
-    for front_page in front_pages:
-        event_ids = get_event_ids(front_page, verbose=verbose)
-        all_event_ids.update(event_ids)
-
-    return all_event_ids
+# def get_all_event_ids(front_pages, verbose=False):
+#     """
+#     Takes in a list of front pages of mtgtop8.com and returns a list of all
+#         the event ids
+#
+#     INPUT:
+#         - front_pages: a list of BeautifulSoup object of the event page
+#
+#     OUTPUT:
+#         - all_event_ids: a set of all the event ids from the 'Last 10 Events' table
+#     """
+#
+#     all_event_ids = set()
+#     for front_page in front_pages:
+#         event_ids = get_event_ids(front_page, verbose=verbose)
+#         all_event_ids.update(event_ids)
+#
+#     return all_event_ids
 
 # used in make_user_card_counts_2
 def get_deck_ids(event_page, verbose=False):
@@ -97,35 +97,35 @@ def deck_request(deck_id, verbose=False):
         # if good status code, quit loop and return
         # otherwise, keep going for a max of 5 times
         if response.status_code == 200:
-            if verbose: print('bad status code: {}. try {} of 5'.format(
-                                            reponse.status_code, i))
             break
+
+            if verbose: print('bad status code: {}. try {} of 5'.format(response.status_code, i+1))
 
     deck_list = response.text.split('\r\n')
 
     return deck_list
 
-def deck_requests(deck_ids, verbose=False):
-    """Takes a set of deck ids and returns the responses from the requests. Errors will come later.
-
-    INPUT:
-        - deck_ids: the set of unique ids for each ofthe desired deck lists from mtgtop8.com
-
-    OUTPUT:
-        - deck_lists: a dictionary with key=deck_id and value=deck_list"""
-
-    deck_lists = {}
-    counter = 1
-    end = len(deck_ids)
-    for deck_id in deck_ids:
-        if verbose: print('Deck request {} of {}'.format(counter, end))
-        deck_list = deck_request(deck_id, verbose=verbose)
-        deck_lists[deck_id] = deck_list
-
-        counter += 1
-
-    # FUTURE WORK: check the status code
-    return deck_lists
+# def deck_requests(deck_ids, verbose=False):
+#     """Takes a set of deck ids and returns the responses from the requests. Errors will come later.
+#
+#     INPUT:
+#         - deck_ids: the set of unique ids for each ofthe desired deck lists from mtgtop8.com
+#
+#     OUTPUT:
+#         - deck_lists: a dictionary with key=deck_id and value=deck_list"""
+#
+#     deck_lists = {}
+#     counter = 1
+#     end = len(deck_ids)
+#     for deck_id in deck_ids:
+#         if verbose: print('Deck request {} of {}'.format(counter, end))
+#         deck_list = deck_request(deck_id, verbose=verbose)
+#         deck_lists[deck_id] = deck_list
+#
+#         counter += 1
+#
+#     # FUTURE WORK: check the status code
+#     return deck_lists
 
 # used in make_user_card_counts_2
 def event_request(event_id, verbose=False):
@@ -137,7 +137,7 @@ def event_request(event_id, verbose=False):
     OUTPUT:
         - response: the response from the get request"""
 
-    if verbose: print('\t\tEvent request for event id {}'.format(event_id))
+    if verbose: print('\tEvent request for event id {}'.format(event_id))
 
     # repeat this process a max of 5 times. If status_code==200, break
     for i in range(5):
@@ -150,33 +150,33 @@ def event_request(event_id, verbose=False):
         # if good status code, quit loop and return
         # otherwise, keep going for a max of 5 times
         if response.status_code == 200:
-            if verbose: print('bad status code: {}. try {} of 5'.format(
-                                                reponse.status_code, i))
             break
+
+        if verbose: print('bad status code: {}. try {} of 5'.format(response.status_code, i+1))
 
     return response
 
-def event_requests(event_ids, verbose=False):
-    """
-    Takes a list of event ids and returns a list of BeautifulSoup objects of
-    the responses from the requests. Errors will come later.
-
-    INPUT:
-        - event_ids: the list of unique ids for the desired events from
-                     mtgtop8.com
-
-    OUTPUT:
-        - event_pages: the list of BeautifulSoup objects of the responses from
-                       the get requests
-    """
-
-    event_pages = []
-    for event_id in event_ids:
-        event_page = BeautifulSoup(event_request(event_id).text, 'html.parser')
-        event_pages.append(event_page)
-
-    # FUTURE WORK: check the status code
-    return event_pages
+# def event_requests(event_ids, verbose=False):
+#     """
+#     Takes a list of event ids and returns a list of BeautifulSoup objects of
+#     the responses from the requests. Errors will come later.
+#
+#     INPUT:
+#         - event_ids: the list of unique ids for the desired events from
+#                      mtgtop8.com
+#
+#     OUTPUT:
+#         - event_pages: the list of BeautifulSoup objects of the responses from
+#                        the get requests
+#     """
+#
+#     event_pages = []
+#     for event_id in event_ids:
+#         event_page = BeautifulSoup(event_request(event_id).text, 'html.parser')
+#         event_pages.append(event_page)
+#
+#     # FUTURE WORK: check the status code
+#     return event_pages
 
 # used in make_user_card_counts_2
 def modern_front_page_request(page_number=0, verbose=False):
@@ -190,7 +190,7 @@ def modern_front_page_request(page_number=0, verbose=False):
         - response: the response from the get request"""
 
     # repeat this process a max of 5 times. If status_code==200, break
-    if verbose: print('\tRequesting front page number {}'.format(page_number))
+    if verbose: print('Requesting front page number {}'.format(page_number))
 
 
     for i in range(5):
@@ -203,34 +203,34 @@ def modern_front_page_request(page_number=0, verbose=False):
         # if good status code, quit loop and return
         # otherwise, keep going for a max of 5 times
         if response.status_code == 200:
-            if verbose: print('bad status code: {}. try {} of 5'.format(
-                                            reponse.status_code, i))
             break
+
+        if verbose: print('bad status code: {}. try {} of 5'.format(response.status_code, i+1))
 
     return response
 
-def modern_front_page_requests(page_numbers=[0], verbose=False):
-    """
-    Sends a get request to get the modern front page from mtgtop8.com. One
-        request is made for each value in page_numbers.
-
-    INPUT:
-        - page_numbers: a list of values for 'cp' in the get request to mtgtop8.
-                        Default value of [0].
-
-    OUTPUT:
-        - front_pages: a list of BeautifulSoup objects for each of the modern
-                       front pages.
-    """
-
-    front_pages = []
-    for page_number in page_numbers:
-        response = modern_front_page_request(page_number, verbose=verbose)
-        front_page = BeautifulSoup(response.text, 'html.parser')
-        front_pages.append(front_page)
-
-    # FUTURE WORK: check the status code
-    return front_pages
+# def modern_front_page_requests(page_numbers=[0], verbose=False):
+#     """
+#     Sends a get request to get the modern front page from mtgtop8.com. One
+#         request is made for each value in page_numbers.
+#
+#     INPUT:
+#         - page_numbers: a list of values for 'cp' in the get request to mtgtop8.
+#                         Default value of [0].
+#
+#     OUTPUT:
+#         - front_pages: a list of BeautifulSoup objects for each of the modern
+#                        front pages.
+#     """
+#
+#     front_pages = []
+#     for page_number in page_numbers:
+#         response = modern_front_page_request(page_number, verbose=verbose)
+#         front_page = BeautifulSoup(response.text, 'html.parser')
+#         front_pages.append(front_page)
+#
+#     # FUTURE WORK: check the status code
+#     return front_pages
 
 def get_deck_lists(event_ids, verbose=False):
     """
@@ -266,36 +266,36 @@ def get_deck_lists(event_ids, verbose=False):
 
     return deck_lists
 
-def scrape_deck_lists(page_numbers=[0], verbose=False):
-    """
-    Does the entire web scraping process. Requests the front page of
-
-    INPUT: NONE
-
-    OUTPUT:
-        - deck_lists: a dictionary of deck lists with key=deck_id and
-                      value=deck_list
-    """
-
-    # get the modern page with the first 10 events
-    if verbose: print('Requesting the front pages')
-    front_pages = modern_front_page_requests(page_numbers=page_numbers,
-                                                verbose=verbose)
-
-    # get the event ids from the page with the first 10 events
-    if verbose: print('Getting all event ids')
-    event_ids = get_all_event_ids(front_pages, verbose=verbose)
-
-    # using event ids, get a set of deck lists
-    if verbose: print('Getting deck lists')
-    deck_lists = get_deck_lists(event_ids, verbose=verbose)
-
-    return deck_lists
-
-if __name__ == '__main__':
-    start_time = time.time()
-    deck_lists = scrape_deck_lists()
-    end_time = time.time()
-
-    print('{} decks scraped! Duration: {}'.format(len(deck_lists),
-                                            end_time - start_time))
+# def scrape_deck_lists(page_numbers=[0], verbose=False):
+#     """
+#     Does the entire web scraping process. Requests the front page of
+#
+#     INPUT: NONE
+#
+#     OUTPUT:
+#         - deck_lists: a dictionary of deck lists with key=deck_id and
+#                       value=deck_list
+#     """
+#
+#     # get the modern page with the first 10 events
+#     if verbose: print('Requesting the front pages')
+#     front_pages = modern_front_page_requests(page_numbers=page_numbers,
+#                                                 verbose=verbose)
+#
+#     # get the event ids from the page with the first 10 events
+#     if verbose: print('Getting all event ids')
+#     event_ids = get_all_event_ids(front_pages, verbose=verbose)
+#
+#     # using event ids, get a set of deck lists
+#     if verbose: print('Getting deck lists')
+#     deck_lists = get_deck_lists(event_ids, verbose=verbose)
+#
+#     return deck_lists
+#
+# if __name__ == '__main__':
+#     start_time = time.time()
+#     deck_lists = scrape_deck_lists()
+#     end_time = time.time()
+#
+#     print('{} decks scraped! Duration: {}'.format(len(deck_lists),
+#                                             end_time - start_time))

@@ -69,6 +69,6 @@ def make_card_dict(modern_legal_cards):
 
     return card_dict
 
-if __name__ == '__main__':
-    modern_legal_cards = scrape_modern_cards(verbose=True)
-    card_dict = make_card_dict(modern_legal_cards)
+# if __name__ == '__main__':
+#     modern_legal_cards = scrape_modern_cards(verbose=True)
+#     card_dict = make_card_dict(modern_legal_cards)
