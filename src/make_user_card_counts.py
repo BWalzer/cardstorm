@@ -1,134 +1,127 @@
-import json
+import psycopg2
+import re # used to get the deck_id from the filename
 import boto3
-from bs4 import BeautifulSoup
-import deck_scraping
-import card_scraping
+import os
+from os import listdir # used for looping through all the files in a directory
 
+dbname = os.environ['CAPSTONE_DB_DBNAME']
+host = os.environ['CAPSTONE_DB_HOST']
+username = os.environ['CAPSTONE_DB_USERNAME']
 
-def split_single_card_string(deck_id, card_string):
+conn = psycopg2.connect('dbname={} host={} user={}'.format(dbname, host, username))
+cursor = conn.cursor()
+
+def format_deck(raw_deck_list):
     """
-    Turns a single card string line from a deck list into a tuple.
+    Takes a raw deck list and returns a nicely formatted deck list.
 
     INPUT:
-        - deck_id: the unique deck id from mtgtop8 assosciated with this deck
-        - card_string: the single row from the deck list
+        - raw_deck_list: String, unformatted deck list read directly from a file
 
     OUTPUT:
-        - user_card_count: a tuple of the form (deck_id, card_name, card_count)
+        - deck_list: list of strings, a formatted deck list ready for processing
+    """
+    deck_list = []
+    for row in raw_deck_list.split('\r\n'):
+        print(row)
+        if row.startswith('S'):
+            break
+        deck_list.append(row)
+
+    return deck_list
+
+def parse_card_string(card_string):
+    """
+    Parses a single row of a deck list.
+
+    INPUT:
+        - card_string: a string of a row of the deck list
+
+    OUTPUT:
+        - card_name: a string of the name of the card
+        - card_count: an int of the number of this card in the deck
     """
     card_count = int(card_string[0])
     card_name = card_string[2:]
-    user_card_count = (int(deck_id), card_name, card_count)
+
+    return card_name, card_count
+
+def make_user_card_counts(deck_id, deck_list):
+    """
+    Takes a deck_id and deck_list and returns user-card-count tuples.
+
+    INPUT:
+        - deck_id: the unique identifier for the deck
+        - deck_list: the deck list read from a file, formatted
+    OUTPUT:
+        - user_card_count: a tuple containing the deck_id, card_name and
+                           card_count for each card in the deck.
+    """
+
+    user_card_count = []
+    for card_string in deck_list:
+        # hit the sideboard, done
+        if card_string[0] == 'S':
+            break
+        card_name, card_count = parse_card_string(card_string)
+
+        user_card_count.append((deck_id, card_name, card_count))
 
     return user_card_count
 
-def decklist_deconstructor(deck_id, deck_list):
+def read_deck_list(filepath):
     """
-    Turns a single deck list into a list of tuples of (deck_id, card_name, card_count)
+    Takes a filepath and reads the contents of the raw deck list stored there.
 
     INPUT:
-        - deck_id: the unique deck id assosciated with this deck
-        - deck_list: a list of card_strings, containing the card count and name
-                     of each card in the deck
+        - filepath: string, the full path of the requested file,
+                    i.e, 'data/raw_deck_lists/deck_list_371829'
 
     OUTPUT:
-        - user_card_counts: a list of tuples of (deck_id, card_name, card_count)
-                            for the deck list
+        - raw_deck_list: string, the un-formatted deck list read from the file
     """
-    user_card_counts = []
-    for card_string in deck_list:
-        # not worrying about sideboards for now
-        if card_string[0] == 'S':
-            break
+    s3 = boto3.client('s3')
+    bucketname = 'mtg-capstone'
 
-        user_card_count = split_single_card_string(deck_id, card_string)
-        user_card_counts.append(user_card_count)
+    response = s3.get_object(Bucket=bucketname, Key=filepath)
+    raw_deck_list = response['Body'].read().decode()
 
-    return user_card_counts
+    return raw_deck_list
 
-# def make_user_card_counts(deck_lists):
-#     """
-#     Takes in a bunch of deck lists and returns a list of user_card_counts.
-#
-#     INPUT:
-#         - deck_lists: a list of deck lists from the deck_scraping
-#
-#     OUTPUT:
-#         - user_card_counts: list of tuples of (deck_id, card_name, card_count)
-#                             for each deck list in deck_lists
-#     """
-#     user_card_counts = []
-#     for deck_id, deck_list in deck_lists.items():
-#         user_card_count = decklist_deconstructor(deck_id, deck_list)
-#         user_card_counts.append(user_card_count)
-#
-#     return flatten(user_card_counts)
-
-def scrape_decklists(scraped_events, front_pages=[0], verbose=False):
+def add_item_db(user_card_count):
     """
-    Version 2. Creates the user_card_count pairs from deck lists and stores them
-    in a data base.
+    Adds a user_card_count item to the Postgres database.
 
     INPUT:
-        - front_pages: list of integers for each front page to request. Each
-                       value in the list will get 10 events. Default value: [0]
-        - verbose: boolean indicating if status messages are printed to the
-                   console. Default value: False
-    OUTPUT:
-        NONE
-    """
-
-    for page_number in front_pages:
-        front_page = deck_scraping.modern_front_page_request(
-                                       page_number=page_number, verbose=verbose)
-        front_page_soup = BeautifulSoup(front_page.text, 'html.parser')
-        event_ids = deck_scraping.get_event_ids(front_page=front_page_soup,
-                                                verbose=verbose)
-
-        for event_id in event_ids:
-            if event_id in scraped_events:
-                if verbose: print('\t\tevent id {} already scraped'.format(event_id))
-                continue
-            event_page = deck_scraping.event_request(event_id=event_id,
-                                                    verbose=verbose)
-            event_page_soup = BeautifulSoup(event_page.text, 'html.parser')
-            deck_ids = deck_scraping.get_deck_ids(event_page=event_page_soup,
-                                                  verbose=verbose)
-            for deck_id in deck_ids:
-                deck_list = deck_scraping.deck_request(deck_id=deck_id,
-                                                       verbose=verbose)
-                save_decklists(deck_id, deck_list)
-
-            scraped_events.add(event_id)
-
-    return scraped_events
-    
-def save_decklists(deck_id, deck_list):
-    """
-    Saves a deck list as a text file in my s3 bucket.
-
-    INPUT:
-        - deck_id: the unique id for the deck list
-        - deck_list: the deck list to be saved in the s3 bucket.
+        - user_card_count: a tuple to be inserted into the db.
 
     OUTPUT:
         NONE
+
     """
 
-    # s3 = boto3.client('s3')
-    # bucketname = 'mtg-capstone'
-    # filename = 'data/raw_deck_lists/deck_list_{}.txt'.format(deck_id)
-    #
-    # s3.put_object(Bucket=bucketname, Key=filename, Body=deck_list)
+    query = """INSERT INTO user_card_counts (user_id, card_name, card_count)
+               VALUES ({user_id}, '{card_name}', {card_count})
+            """.format(user_id=user_card_count[0], card_name=user_card_count[1],
+                       card_count=user_card_count[2])
 
-    print('\t\t\tSaved deck!')
+    cursor.execute(query)
 
+    conn.commit()
+
+def get_deck_id(filepath):
+    """
+    Gets the deck id from the end of the filepath string.
+    """
+
+    return int(re.search('deck_list_(\d+).txt', deck_file).group(1))
 
 if __name__ == '__main__':
-    with open('../data/scraped_events.json', 'r') as f:
-        scraped_events = set(json.load(f))
+    path = '/Users/benjaminwalzer/Documents/Galvanize/mtg-capstone/data/raw_deck_lists/'
 
-    updated_scraped_events = make_user_card_counts(scraped_events = scraped_events, verbose=True)
-
-    with open ('../data/scraped_events.json', 'w') as f:
-        json.dump(list(updated_scraped_events), f)
+    for deck_file in listdir(path):
+        deck_id = int(re.search('deck_list_(\d+).txt', deck_file).group(1))
+        with open(path + deck_file, 'r') as f:
+            deck_list = f.read()
+            for item in make_user_card_counts(deck_id, deck_list):
+                print(item)

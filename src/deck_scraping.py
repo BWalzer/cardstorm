@@ -3,7 +3,10 @@ import re
 import json
 import random
 import time
+import boto3
 from bs4 import BeautifulSoup
+
+s3 = boto3.client('s3')
 
 def get_event_ids(front_page, verbose=False):
     """
@@ -67,18 +70,22 @@ def deck_request(deck_id, verbose=False):
 
     # repeat this process a max of 5 times. If status_code==200, break
     for i in range(5):
-        response = requests.get('http://mtgtop8.com/mtgo?d={}'.format(deck_id),
+        try:
+            response = requests.get('http://mtgtop8.com/mtgo?d={}'.format(deck_id),
                                 headers={'User-Agent': 'Getting some deck lists'})
 
+            # if good status code, quit loop and return
+            # otherwise, keep going for a max of 5 times
+            if response.status_code == 200:
+                break
+
+            if verbose: print('bad status code: {}. try {} of 5'.format(response.status_code, i+1))
+
+        except:
+            print("Error connecting to http://mtgtop8.com/mtgo?d={}".format(deck_id))
         # preventing submitting too fast
         time.sleep(2 + random.random())
 
-        # if good status code, quit loop and return
-        # otherwise, keep going for a max of 5 times
-        if response.status_code == 200:
-            break
-
-            if verbose: print('bad status code: {}. try {} of 5'.format(response.status_code, i+1))
 
     deck_list = response.content
 
@@ -97,18 +104,21 @@ def event_request(event_id, verbose=False):
 
     # repeat this process a max of 5 times. If status_code==200, break
     for i in range(5):
-        response = requests.get('http://mtgtop8.com/event?e={}'.format(event_id),
+        try:
+            response = requests.get('http://mtgtop8.com/event?e={}'.format(event_id),
                                 headers={'User-Agent': 'Getting some event info'})
-
-        # preventing submitting too fast
-        time.sleep(2 + random.random())
 
         # if good status code, quit loop and return
         # otherwise, keep going for a max of 5 times
         if response.status_code == 200:
             break
-
         if verbose: print('bad status code: {}. try {} of 5'.format(response.status_code, i+1))
+        except:
+            print("Error connecting to http://mtgtop8.com/event?e={}".format(event_id))
+
+        # preventing submitting too fast
+        time.sleep(2 + random.random())
+
 
     return response
 
@@ -127,18 +137,20 @@ def modern_front_page_request(page_number=0, verbose=False):
 
 
     for i in range(5):
-        response = requests.get('http://mtgtop8.com/format?f=MO&meta=44&cp={}'.format(page_number),
-                                headers={'User-Agent': 'Modern front page request'})
+        try:
+            response = requests.get('http://mtgtop8.com/format?f=MO&meta=44&cp={}'.format(page_number),
+                                    headers={'User-Agent': 'Modern front page request'})
+            # if good status code, quit loop and return
+            # otherwise, keep going for a max of 5 times
+            if response.status_code == 200:
+                break
 
+            if verbose: print('bad status code: {}. try {} of 5'.format(response.status_code, i+1))
+
+        except:
+            print("Error connecting to http://mtgtop8.com/format?f=MO&meta=44&cp={}".format(page_number))
 
         time.sleep(2 + random.random())
-
-        # if good status code, quit loop and return
-        # otherwise, keep going for a max of 5 times
-        if response.status_code == 200:
-            break
-
-        if verbose: print('bad status code: {}. try {} of 5'.format(response.status_code, i+1))
 
     return response
 
@@ -228,22 +240,22 @@ def save_decklists(deck_id, deck_list, verbose=False):
         NONE
     """
 
-    # s3 = boto3.client('s3')
-    # bucketname = 'mtg-capstone'
-    # filename = 'data/raw_deck_lists/deck_list_{}.txt'.format(deck_id)
-    #
-    # s3.put_object(Bucket=bucketname, Key=filename, Body=deck_list)
-    # if verbose: print('\t\t\tsaved deck in s3 bucket')
+    bucketname = 'mtg-capstone'
+    filename = 'data/raw_deck_lists/deck_list_{}.txt'.format(deck_id)
 
-    if verbose: print('\t\t\tSaved deck!')
+    s3.put_object(Bucket=bucketname, Key=filename, Body=deck_list)
+
 
 
 if __name__ == '__main__':
-    with open('../data/scraped_events.json', 'r') as f:
-        scraped_events = set(json.load(f))
+    response = s3.get_object(Bucket='mtg-capstone', Key='data/scraped_events.json')
+    scraped_events = set(json.loads(response['Body'].read().decode()))
+    print('Scraped event ids: {}'.format(scraped_events))
 
     updated_scraped_events = scrape_decklists(scraped_events=scraped_events,
-                                              front_pages=range(1),
+                                              front_pages=range(100),
                                               verbose=True)
-    with open('../data/scraped_events.json', 'w') as f:
-        json.dump(list(updated_scraped_events), f)
+
+    print('Updated scraped event ids: {}'.format(updated_scraped_events))
+    s3.put_object(Bucket='mtg-capstone', Key='data/scraped_events.json',
+                  Value=json.dumps(list(updated_scraped_events)))
