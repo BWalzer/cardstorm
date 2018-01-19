@@ -42,12 +42,14 @@ def parse_card_string(card_string):
         - card_name: a string of the name of the card
         - card_count: an int of the number of this card in the deck
     """
-    card_count = int(card_string[0])
-    card_name = card_string[2:]
+    if card_string:
+        card_count = int(card_string[0])
+        card_name = card_string[2:]
+        return True, card_name, card_count
 
-    return card_name, card_count
+    return False, None, None
 
-def make_user_card_counts(deck_id, deck_list):
+def make_user_card_counts(event_id, deck_id, deck_list):
     """
     Takes a deck_id and deck_list and returns user-card-count tuples.
 
@@ -61,8 +63,9 @@ def make_user_card_counts(deck_id, deck_list):
 
     user_card_count = []
     for card_string in deck_list:
-        card_name, card_count = parse_card_string(card_string)
-        user_card_count.append((int(deck_id), card_name, card_count))
+        success, card_name, card_count = parse_card_string(card_string)
+        if success:
+            user_card_count.append((event_id, deck_id, card_name, card_count))
 
     return user_card_count
 
@@ -99,11 +102,10 @@ def upload_user_card_counts(user_card_counts, cursor):
     '''
 
     template = ', '.join(['%s'] * len(user_card_counts))
-    query = 'INSERT INTO user_card_counts (deck_id, card_name, card_count) VALUES {}'.format(template)
+    query = 'INSERT INTO event_deck_card_count (event_id, deck_id, card_name, card_count) VALUES {}'.format(template)
 
     try:
         cursor.execute(query=query, vars=user_card_counts)
-        conn.commit()
     except psycopg2.IntegrityError:
         print('            duplicate key: deck not added to db')
         return False
@@ -351,19 +353,7 @@ def scrape_decklists(scraped_events, front_pages=[0], verbose=False):
 
     return scraped_events
 
-def scrape_decklists_2(scraped_events, front_pages=[0], verbose=False):
-    '''
-
-    Front page request
-        get event ids
-        for event ids:
-            event request
-            get deck ids
-            for deck_ids:
-                deck request
-                make user-card-counts
-                upload to db
-    '''
+def scrape_decklists_2(front_pages=[0], verbose=False):
     dbname = os.environ['CAPSTONE_DB_DBNAME']
     host = os.environ['CAPSTONE_DB_HOST']
     username = os.environ['CAPSTONE_DB_USERNAME']
@@ -371,6 +361,9 @@ def scrape_decklists_2(scraped_events, front_pages=[0], verbose=False):
 
     conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname, host, username, password))
     cursor = conn.cursor()
+
+    cursor.execute('SELECT DISTINCT event_id FROM event_deck_card_count')
+    scraped_events = set(cursor.fetchall())
     for page_number in front_pages:
         raw_front_page = modern_front_page_request(page_number=page_number, verbose=verbose)
         front_page = BeautifulSoup(raw_front_page.text, 'html.parser')
@@ -389,27 +382,23 @@ def scrape_decklists_2(scraped_events, front_pages=[0], verbose=False):
             for deck_id in deck_ids:
                 raw_deck_list = deck_request(deck_id, verbose=verbose)
                 deck_list = format_deck(raw_deck_list)
-                user_card_counts = make_user_card_counts(deck_id, deck_list)
+                user_card_counts = make_user_card_counts(event_id, deck_id, deck_list)
                 success = upload_user_card_counts(user_card_counts, cursor)
 
-                if not success:
+                if success:
+                    conn.commit()
+                else:
                     conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname, host, username, password))
                     cursor = conn.cursor()
 
 
-            scraped_events.add(event_id)
-
-    return list(scraped_events)
-
-
 if __name__ == '__main__':
-    response = s3.get_object(Bucket='mtg-capstone', Key='data/scraped_events.json')
-    scraped_events = set(json.loads(response['Body'].read().decode()))
-    print('scraped event ids: {}'.format(scraped_events))
+    # response = s3.get_object(Bucket='mtg-capstone', Key='data/scraped_events.json')
+    # scraped_events = set(json.loads(response['Body'].read().decode()))
+    # print('scraped event ids: {}'.format(scraped_events))
 
-    updated_scraped_events = scrape_decklists_2(scraped_events=scraped_events,
-                                              verbose=True, front_pages=range(1,100))
+    scrape_decklists_2(verbose=True, front_pages=range(1,100))
 
-    print('updated scraped event ids: {}'.format(updated_scraped_events))
-    s3.put_object(Bucket='mtg-capstone', Key='data/scraped_events.json',
-                  Body=json.dumps(updated_scraped_events))
+    # print('updated scraped event ids: {}'.format(updated_scraped_events))
+    # s3.put_object(Bucket='mtg-capstone', Key='data/scraped_events.json',
+    #               Body=json.dumps(updated_scraped_events))
