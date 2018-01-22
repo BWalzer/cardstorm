@@ -4,6 +4,7 @@ import json
 import random
 import time
 import boto3
+import math
 from bs4 import BeautifulSoup
 import psycopg2
 import os
@@ -88,13 +89,14 @@ def read_deck_list(filepath):
 
     return raw_deck_list
 
-def upload_user_card_counts(user_card_counts, cursor):
+def upload_user_card_counts(user_card_counts, cursor, verbose=False):
     '''
     Uploads a deck list, split into user_card_count pairs, to the PostreSQL database.
 
     INPUT:
         - user_card_count: list of tuples containing the user_card_counts for a deck list
         - cursor: cursor object, from the databse connection
+        - verbose: bool, if True status statements are printed
 
     OUTPUT:
         - success: bool: True if user_card_counts was successfully uploaded to the database.
@@ -106,12 +108,37 @@ def upload_user_card_counts(user_card_counts, cursor):
 
     try:
         cursor.execute(query=query, vars=user_card_counts)
+
     except psycopg2.IntegrityError:
-        print('            duplicate key: deck not added to db')
+        if verbose: print('            duplicate key: deck not added to db')
         return False
 
     return True
 
+def get_cardstorm_id(card_name, cursor):
+    '''
+    Turns a card name into its' unique cardstorm id
+
+    INPUT:
+        - card_name: string, the name of a magic card
+        - cursor: psycopg2 cursor object
+
+    OUTPUT:
+        - cardstorm_id: int, unique id for the card
+        - success: bool, True if no exceptions were thrown
+    '''
+
+    query = '''SELECT cardstorm_id
+               FROM cards
+               WHERE name = %s'''
+
+    try:
+        cursor.execute(query=query, vars=card_name)
+    except:
+        if verbose: print('could not find cardstorm_id for {}'.format(card_name))
+        return '', False
+
+    return cursor.fetchall(), True
 ################################################################################
 ############## Above functions from make_user_card_counts.py ###################
 ################################################################################
