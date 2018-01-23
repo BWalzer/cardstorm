@@ -3,7 +3,7 @@ import json
 import psycopg2
 import os
 
-def format_card_2(card):
+def format_card(card):
     '''
     Formats cards in a db friendly manner. If the card is multifaced, the first face is used for missing fields
 
@@ -168,96 +168,6 @@ def format_card_2(card):
 
     return formatted_card
 
-def format_card(card):
-    '''
-    Formats cards in a db friendly manner. If the card is multifaced, the first face is used for missing fields
-
-    INPUT:
-        - card: dictionary, magic card from scryfall.com
-
-    OUTPUT:
-        - formatted_card: list, attributes of each card in the following order:
-                            [name, cmc, type_line, oracle_text, mana_cost, power, toughness, colors,
-                            color_identity, legalities, set_code, set_name, collector_number, scryfall_id]
-    '''
-    keys = card.keys()
-    formatted_card = []
-    if 'card_faces' in keys:
-        # multifaced card
-        front_face = card['card_faces'][0]
-        front_keys = front_face.keys()
-
-        formatted_card.append(card['name'])
-        formatted_card.append(card['cmc'])
-        formatted_card.append(front_face['type_line'])
-
-        if 'oracle_text' in front_keys:
-            formatted_card.append(front_face['oracle_text'])
-        else:
-            formatted_card.append(None)
-
-        formatted_card.append(front_face['mana_cost'])
-
-        if 'power' in front_keys:
-            formatted_card.append(front_face['power'])
-        else:
-            formatted_card.append(None)
-
-        if 'toughness' in front_keys:
-            formatted_card.append(front_face['toughness'])
-        else:
-            formatted_card.append(None)
-
-        if 'colors' in keys:
-            formatted_card.append(card['colors'])
-        else:
-            formatted_card.append(front_face['colors'])
-
-        formatted_card.append(card['color_identity'])
-
-        legalities = [k for k, v in card['legalities'].items() if v == 'legal']
-        formatted_card.append(legalities)
-
-        formatted_card.append(card['set'])
-        formatted_card.append(card['set_name'])
-        formatted_card.append(card['collector_number'])
-        formatted_card.append(card['id'])
-
-    else:
-        # single faced card
-        formatted_card.append(card['name'])
-        formatted_card.append(card['cmc'])
-        formatted_card.append(card['type_line'])
-
-        if 'oracle_text' in keys:
-            formatted_card.append(card['oracle_text'])
-        else:
-            formatted_card.append(None)
-
-        formatted_card.append(card['mana_cost'])
-
-        if 'power' in keys:
-            formatted_card.append(card['power'])
-        else:
-            formatted_card.append(None)
-
-        if 'toughness' in keys:
-            formatted_card.append(card['toughness'])
-        else:
-            formatted_card.append(None)
-
-        formatted_card.append(card['colors'])
-        formatted_card.append(card['color_identity'])
-
-        legalities = [k for k, v in card['legalities'].items() if v == 'legal']
-        formatted_card.append(legalities)
-        formatted_card.append(card['set'])
-        formatted_card.append(card['set_name'])
-        formatted_card.append(card['collector_number'])
-        formatted_card.append(card['id'])
-
-    return formatted_card
-
 def upload_card(card, cursor, verbose=False):
 
     template = ', '.join(['%s'] * len(card))
@@ -293,7 +203,7 @@ def scrape_modern_cards(verbose=False):
         if verbose: print('processing cards')
         for i, raw_card in enumerate(json_response['data']):
             if verbose: print('{}, "{}"'.format(i, raw_card['name']))
-            card = format_card_2(raw_card)
+            card = format_card(raw_card)
             status = upload_card(card, cursor, verbose=verbose)
 
             if status:
