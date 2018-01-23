@@ -1,3 +1,5 @@
+derby.log
+metastore_db/
 .ipynb_checkpoints/
 __pycache__/
 *.json
