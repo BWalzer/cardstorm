@@ -69,7 +69,7 @@ def format_deck(raw_deck_list):
     """
     deck_list = []
     for row in raw_deck_list.split('\r\n'):
-        if row.startswith('S'):
+        if row.startswith('S') or not row:
             break
         deck_list.append(row)
 
@@ -181,7 +181,7 @@ def get_cardstorm_id(card_name, verbose=False):
                         0 is returned.
     '''
 
-    if verbose: print('{}'.format(card_name))
+    if verbose: print('            {}'.format(card_name))
     try:
         cardstorm_id = card_dict[card_name.lower()]
     except KeyError:
@@ -441,4 +441,4 @@ def scrape_decklists(front_pages=[0], verbose=False):
 
 
 if __name__ == '__main__':
-    scrape_decklists(verbose=True, front_pages=range(1,100))
+    scrape_decklists(verbose=True, front_pages=range(45,100))
