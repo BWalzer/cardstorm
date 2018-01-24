@@ -10,9 +10,6 @@ import psycopg2
 import os
 from os import listdir # used for looping through all the files in a directory
 
-s3 = boto3.client('s3')
-bucketname = 'mtg-capstone'
-
 dbname = os.environ['CAPSTONE_DB_DBNAME']
 host = os.environ['CAPSTONE_DB_HOST']
 username = os.environ['CAPSTONE_DB_USERNAME']
@@ -67,6 +64,8 @@ def format_deck(raw_deck_list):
     OUTPUT:
         - deck_list: list of strings, a formatted deck list ready for processing
     """
+    if not raw_deck_list: # deck list is empty, return []
+        return []
     deck_list = []
     for row in raw_deck_list.split('\r\n'):
         if row.startswith('S') or not row:
@@ -122,25 +121,6 @@ def make_user_card_counts(event_id, deck_id, deck_list,verbose=False):
             user_card_count.append((int(event_id), int(deck_id), cardstorm_id, card_name, card_count))
 
     return user_card_count
-
-def read_deck_list(filepath):
-    """
-    Takes a filepath and reads the contents of the raw deck list stored there.
-
-    INPUT:
-        - filepath: string, the full path of the requested file,
-                    i.e, 'data/raw_deck_lists/deck_list_371829'
-
-    OUTPUT:
-        - raw_deck_list: string, the un-formatted deck list read from the file
-    """
-    s3 = boto3.client('s3')
-    bucketname = 'mtg-capstone'
-
-    response = s3.get_object(Bucket=bucketname, Key=filepath)
-    raw_deck_list = response['Body'].read().decode()
-
-    return raw_deck_list
 
 def upload_user_card_counts(user_card_counts, verbose=False):
     '''
@@ -205,12 +185,6 @@ def get_scraped_deck_ids(verbose=False):
     scraped_deck_ids = {_[0] for _ in cursor.fetchall()}
 
     return scraped_deck_ids
-
-
-################################################################################
-############## Above functions from make_user_card_counts.py ###################
-################################################################################
-
 
 def get_event_ids(front_page, verbose=False):
     """
@@ -357,58 +331,9 @@ def modern_front_page_request(page_number=0, verbose=False):
 
     return response
 
-def get_deck_lists(event_ids, verbose=False):
-    """
-    Takes a list of event ids, sends get requests to mtgtop8.com for each event
-        id and pulls the deck ids from the event page. Once it has all the deck
-        ids from each event page, a dictionary of deck lists is compiled and
-        returned.
-
-    INPUT:
-        - event_ids: a list of unique event ids for the desired events from
-                     mtgtop8.com
-
-    OUTPUT:
-        - deck_lsits: a dictionary of deck lists, with key=deck_id and
-                      value=deck_list.
-
-    """
-
-    deck_ids = set()
-    for event_id in event_ids:
-
-
-        # send a get request to for the event page, and load it into a BS
-        event_page = BeautifulSoup(event_request(event_id).text, 'html.parser',
-                                                            verbose=verbose)
-
-        # update the set of deck ids with result from get_deck_ids()
-        deck_ids.update(get_deck_ids(event_page, verbose=verbose))
-
-    # get a deck list for each deck id, in a dictionary with key=deck_id and
-    # value=deck list
-    deck_lists = deck_requests(deck_ids, verbose=verbose)
-
-    return deck_lists
-
-def save_decklists(deck_id, deck_list, verbose=False):
-    """
-    Saves a deck list as a text file in my s3 bucket.
-
-    INPUT:
-        - deck_id: the unique id for the deck list
-        - deck_list: the deck list to be saved in the s3 bucket.
-
-    OUTPUT:
-        NONE
-    """
-
-    bucketname = 'mtg-capstone'
-    filename = 'data/raw_deck_lists/deck_list_{}.txt'.format(deck_id)
-
-    s3.put_object(Bucket=bucketname, Key=filename, Body=deck_list)
-
 def scrape_decklists(front_pages=[0], verbose=False):
+    global conn
+    global cursor
     scraped_deck_ids = get_scraped_deck_ids()
     for page_number in front_pages:
         raw_front_page = modern_front_page_request(page_number=page_number, verbose=verbose)
@@ -428,17 +353,18 @@ def scrape_decklists(front_pages=[0], verbose=False):
                     continue
                 raw_deck_list = deck_request(deck_id, verbose=verbose)
                 deck_list = format_deck(raw_deck_list)
+                if not deck_list: # empty deck list, skip this deck
+                    if verbose: print('            empty deck list at deck id {}'.format(deck_id))
+                    continue
                 user_card_counts = make_user_card_counts(event_id, deck_id, deck_list, verbose=verbose)
                 success = upload_user_card_counts(user_card_counts, verbose=verbose)
 
                 if success:
                     conn.commit()
                 else:
-                    global conn
                     conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname, host, username, password))
-                    global cursor
                     cursor = conn.cursor()
 
 
 if __name__ == '__main__':
-    scrape_decklists(verbose=True, front_pages=range(45,100))
+    scrape_decklists(verbose=True, front_pages=range(100,200))
