@@ -181,6 +181,7 @@ def get_cardstorm_id(card_name, verbose=False):
                         0 is returned.
     '''
 
+    if verbose: print('{}'.format(card_name))
     try:
         cardstorm_id = card_dict[card_name.lower()]
     except KeyError:
@@ -407,49 +408,8 @@ def save_decklists(deck_id, deck_list, verbose=False):
 
     s3.put_object(Bucket=bucketname, Key=filename, Body=deck_list)
 
-def scrape_decklists(scraped_events, front_pages=[0], verbose=False):
-    """
-    Version 2. Scrapes mtgtop8.com for modern deck lists.
-
-    INPUT:
-        - front_pages: list of integers for each front page to request. Each
-                       value in the list will get 10 events. Default value: [0]
-        - scraped_events: a set of all previously scraped event_ids. These
-                          event_ids will not be re-scraped.
-        - verbose: boolean indicating if status messages are printed to the
-                   console. Default value: False
-    OUTPUT:
-        - scraped_events: a set of event_ids which have been scraped. updated.
-    """
-
-    for page_number in front_pages:
-        front_page = modern_front_page_request(
-                                       page_number=page_number, verbose=verbose)
-        front_page_soup = BeautifulSoup(front_page.text, 'html.parser')
-        event_ids = get_event_ids(front_page=front_page_soup,
-                                                verbose=verbose)
-
-        for event_id in event_ids:
-            if event_id in scraped_events:
-                if verbose: print('        event id {} already scraped'.format(event_id))
-                continue
-            event_page = event_request(event_id=event_id,
-                                                    verbose=verbose)
-            event_page_soup = BeautifulSoup(event_page.text, 'html.parser')
-            deck_ids = get_deck_ids(event_page=event_page_soup,
-                                                  verbose=verbose)
-            for deck_id in deck_ids:
-                deck_list = deck_request(deck_id=deck_id,
-                                                       verbose=verbose)
-                save_decklists(deck_id, deck_list, verbose=verbose)
-
-            scraped_events.add(event_id)
-
-    return scraped_events
-
-def scrape_decklists_2(front_pages=[0], verbose=False):
+def scrape_decklists(front_pages=[0], verbose=False):
     scraped_deck_ids = get_scraped_deck_ids()
-
     for page_number in front_pages:
         raw_front_page = modern_front_page_request(page_number=page_number, verbose=verbose)
         front_page = BeautifulSoup(raw_front_page.text, 'html.parser')
@@ -463,13 +423,13 @@ def scrape_decklists_2(front_pages=[0], verbose=False):
             deck_ids = get_deck_ids(event_page, verbose=verbose)
 
             for deck_id in deck_ids:
-                if deck_id in scraped_deck_ids: # already scraped this deck
-                    if verbose: print('deck id {} has already been scraped'.format(deck_id))
+                if int(deck_id) in scraped_deck_ids: # already scraped this deck
+                    if verbose: print('        deck id {} has already been scraped'.format(deck_id))
                     continue
                 raw_deck_list = deck_request(deck_id, verbose=verbose)
                 deck_list = format_deck(raw_deck_list)
                 user_card_counts = make_user_card_counts(event_id, deck_id, deck_list, verbose=verbose)
-                success = upload_user_card_counts(user_card_counts)
+                success = upload_user_card_counts(user_card_counts, verbose=verbose)
 
                 if success:
                     conn.commit()
@@ -481,4 +441,4 @@ def scrape_decklists_2(front_pages=[0], verbose=False):
 
 
 if __name__ == '__main__':
-    scrape_decklists_2(verbose=True, front_pages=range(1,100))
+    scrape_decklists(verbose=True, front_pages=range(1,100))
