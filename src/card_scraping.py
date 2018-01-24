@@ -20,7 +20,7 @@ def format_card(card):
     keys = card.keys()
     if layout == 'normal' or layout == 'leveler':
         # normal layout, i.e, Lightning Bolt
-        formatted_card.append(card['name'])
+        formatted_card.append(card['name'].lower())
         formatted_card.append(card['cmc'])
         formatted_card.append(card['type_line'])
 
@@ -57,7 +57,7 @@ def format_card(card):
         side_a = card['card_faces'][0]
         side_b = card['card_faces'][1]
 
-        formatted_card.append(card['name'])
+        formatted_card.append(card['name'].lower())
         formatted_card.append(card['cmc'])
         formatted_card.append(' // '.join([side_a['type_line'], side_b['type_line']]))
         formatted_card.append(' // '.join([side_a['oracle_text'], side_b['oracle_text']]))
@@ -79,7 +79,7 @@ def format_card(card):
         side_a = card['card_faces'][0]
         side_b = card['card_faces'][1]
 
-        formatted_card.append(side_a['name'])
+        formatted_card.append(side_a['name'].lower())
         formatted_card.append(card['cmc'])
         formatted_card.append(' // '.join([side_a['type_line'], side_b['type_line']]))
         formatted_card.append(' // '.join([side_a['oracle_text'], side_b['oracle_text']]))
@@ -104,7 +104,7 @@ def format_card(card):
         side_a_keys = side_a.keys()
         side_b_keys = side_b.keys()
 
-        formatted_card.append(side_a['name'])
+        formatted_card.append(side_a['name'].lower())
         formatted_card.append(card['cmc'])
         formatted_card.append(' // '.join([side_a['type_line'], side_b['type_line']]))
         if 'oracle_text' in side_a_keys: a_oracle_text = side_a['oracle_text']
@@ -134,7 +134,7 @@ def format_card(card):
     elif layout == 'meld':
         # meld layout, i.e, Bruna, the Fading Light
         # this layout turns out to be pretty much the same as a normal card
-        formatted_card.append(card['name'])
+        formatted_card.append(card['name'].lower())
         formatted_card.append(card['cmc'])
         formatted_card.append(card['type_line'])
 
