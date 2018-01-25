@@ -23,6 +23,7 @@ class ReflexiveDict():
 
     def __init__(self):
         self._dict = {}
+        self._get_cards()
 
     def __setitem__(self, key, val):
         self._dict[key] = val
@@ -37,7 +38,7 @@ class ReflexiveDict():
     def __contains__(self, key):
         return key in self._dict
 
-    def get_cards(self):
+    def _get_cards(self):
         query = 'Select name, cardstorm_id FROM cards'
 
         try:
@@ -50,9 +51,13 @@ class ReflexiveDict():
 
         return True
 
+    def get_cardstorm_ids(self):
+        all_cardstorm_ids = [key for key in self.keys() if isinstance(key, int)]
+
+        return sorted(all_cardstorm_ids)
+
 # dictionary of every modern legal card
 card_dict = ReflexiveDict()
-card_dict.get_cards()
 
 def format_deck(raw_deck_list):
     """
