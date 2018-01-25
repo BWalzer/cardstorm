@@ -228,7 +228,7 @@ def get_deck_ids(event_page, verbose=False):
     # loop through each of the anchor tags in each of the deck list tables
     for anchor in deck_list_table:
         # find only anchors where 'e=' and 'd=' are in the href. This is only the actual deck lists
-        if ('d=' in anchor['href'] and 'e=' in anchor['href']):
+        if ('&d=' in anchor['href'] and '?e=' in anchor['href']):
             # add the id to the list
             deck_ids.append(re.search('d=(\d+)&', anchor['href']).group(1))
 
@@ -367,4 +367,4 @@ def scrape_decklists(front_pages=[0], verbose=False):
 
 
 if __name__ == '__main__':
-    scrape_decklists(verbose=True, front_pages=range(100,200))
+    scrape_decklists(verbose=True, front_pages=range(113,200))
