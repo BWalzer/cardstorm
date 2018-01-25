@@ -8,18 +8,23 @@ import multiprocessing
 from pyspark.mllib.recommendation import ALS
 from pyspark.sql.types import StructField, StructType, IntegerType
 
-def get_deck_card_counts():
+def get_deck_card_counts(schema):
     '''
     Gets the deck data needed for the Spark ALS model.
 
     INPUT:
-        NONE
+        - schema: StructType object, schema for spark ratings df
 
     OUTPUT:
-        # - success: bool, True if nothing went wrong when querying db
+        - incomplete_ratings: Spark df, ratings for all deck-card combos found in real decks
     '''
 
     cursor.execute('SELECT deck_id, cardstorm_id, card_count FROM decks')
+
+    incomplete_ratings = spark.createDataFrame(data=cursor.fetchall(),
+                                               schema=schema)
+
+    return incomplete_ratings
 
 def get_unused_cardstorm_ids():
     '''
@@ -99,8 +104,9 @@ def do_everything():
     ratings_schema = StructType([StructField('deck_id', IntegerType()),
                                  StructField('cardstorm_id', IntegerType()),
                                  StructField('card_count', IntegerType())])
-    incomplete_ratings = spark.createDataFrame(data=cursor.fetchall(),
-                                               schema=ratings_schema)
+
+    incomplete_ratings = get_deck_card_counts(schema=ratings_schema)
+
     unused_ids = get_unused_cardstorm_ids()
 
     filler_data = fill_unused_cardstorm_ids(unused_ids)
