@@ -115,7 +115,6 @@ def make_user_card_counts(event_id, deck_id, deck_list,verbose=False):
         parse_success, card_name, card_count = parse_card_string(card_string)
         cardstorm_id = get_cardstorm_id(card_name, verbose=verbose)
         if not cardstorm_id: # could not find cardstorm_id, most likely not a valid card
-            if verbose: print('skipping card {}, could not find in db'.format(card_name))
             continue
         if parse_success:
             user_card_count.append((int(event_id), int(deck_id), cardstorm_id, card_name, card_count))
@@ -165,7 +164,7 @@ def get_cardstorm_id(card_name, verbose=False):
     try:
         cardstorm_id = card_dict[card_name.lower()]
     except KeyError:
-        if verbose: print('{} not found'.format(card_name))
+        if verbose: print('            {} not found'.format(card_name))
         return 0
 
     return cardstorm_id
@@ -367,4 +366,4 @@ def scrape_decklists(front_pages=[0], verbose=False):
 
 
 if __name__ == '__main__':
-    scrape_decklists(verbose=True, front_pages=range(113,200))
+    scrape_decklists(verbose=True, front_pages=range(191,200))
