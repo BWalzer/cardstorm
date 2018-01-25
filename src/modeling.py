@@ -86,8 +86,19 @@ def upload_product_rdd(product_rdd):
 
     return True
 
-def do_everything():
+def make_recommender():
     '''
+    Makes the recommender model! Gets deck data from the database, makes filler
+    data for unused cards, uses Spark ALS to train a model of implicit ratings.
+    Pulls out the product features matrix (often referred to as V) and
+    uploads it to the database with the current data attached.
+
+    INPUT:
+        NONE
+
+    OUTPUT:
+        NONE
+        
     Does everything
 
         Get deck data from db
