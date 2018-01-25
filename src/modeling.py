@@ -1,8 +1,6 @@
 import pyspark as ps
 import psycopg2
 import os
-import pandas as pd
-import numpy as np
 import datetime
 import multiprocessing
 from pyspark.mllib.recommendation import ALS
@@ -83,6 +81,7 @@ def upload_product_rdd(product_rdd):
         try:
             cursor.execute(query, vars=[cardstorm_id, features, current_date])
         except psycopg2.IntegrityError:
+            c
             continue
 
 def do_everything():
