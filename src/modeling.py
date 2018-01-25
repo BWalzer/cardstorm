@@ -70,7 +70,7 @@ def upload_product_rdd(product_rdd):
         - product_rdd: Spark rdd, features pulled from fitted Spark ALS model
 
     OUTPUT:
-        NONE
+        - success: bool, True if no problems were encountered.
     '''
     current_date = str(datetime.date.today())
 
@@ -81,8 +81,10 @@ def upload_product_rdd(product_rdd):
         try:
             cursor.execute(query, vars=[cardstorm_id, features, current_date])
         except psycopg2.IntegrityError:
-            c
+            return False
             continue
+
+    return True
 
 def do_everything():
     '''
@@ -118,7 +120,9 @@ def do_everything():
 
     product_rdd = model.productFeatures()
 
-    upload_product_rdd(product_rdd)
+    upload_status = upload_product_rdd(product_rdd)
+
+    if upload_status: conn.commit()
 
 if __name__ == '__main__':
     global dbname, hoest, username, password, conn, cursor, spark
