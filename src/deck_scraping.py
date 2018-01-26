@@ -1,14 +1,12 @@
 import requests
 import re
+import numpy as np
 import json
 import random
 import time
-import boto3
-import math
 from bs4 import BeautifulSoup
 import psycopg2
 import os
-from os import listdir # used for looping through all the files in a directory
 
 dbname = os.environ['CAPSTONE_DB_DBNAME']
 host = os.environ['CAPSTONE_DB_HOST']
@@ -54,7 +52,7 @@ class ReflexiveDict():
     def get_cardstorm_ids(self):
         all_cardstorm_ids = [key for key in self.keys() if isinstance(key, int)]
 
-        return sorted(all_cardstorm_ids)
+        return np.array(sorted(all_cardstorm_ids))
 
 # dictionary of every modern legal card
 card_dict = ReflexiveDict()
