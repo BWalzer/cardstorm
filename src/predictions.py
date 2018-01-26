@@ -106,10 +106,10 @@ def solve_system(feature_matrix, deck_vector):
                             deck_vector = (u_vector)*(feature_matrix)
     '''
 
-    if deck_vector:
+    if len(deck_vector) > 0:
         u_vector = np.linalg.lstsq(feature_matrix, deck_vector)[0]
     else:
-        return False
+        return np.array([])
 
     return u_vector
 
@@ -125,7 +125,7 @@ def top_n_recommendations(recommendations, deck_vector, all_cardstorm_ids, n=10)
         OUTPUT:
             top_recommendations: numpy array, the top n recommendations in descending order
     '''
-    top_recommendations = all_cardstorm_ids[np.argsort(recommendations - deck_vector)[:-n:-1]]
+    top_recommendations = all_cardstorm_ids[np.argsort(recommendations - deck_vector)[:-n-1:-1]]
 
     return top_recommendations
 
@@ -141,7 +141,7 @@ def bottom_n_recommendations(recommendations, deck_vector, all_cardstorm_ids, n=
         OUTPUT:
             bottom_recommendations: numpy array, the top n recommendations in descending order
     '''
-    bottom_recommendations = all_cardstorm_ids[np.argsort(recommendations - deck_vector)[:n]
+    bottom_recommendations = all_cardstorm_ids[np.argsort(recommendations - deck_vector)[:n]]
 
     return bottom_recommendations
 
@@ -168,7 +168,7 @@ def make_recommendations(raw_deck_list, num_top_recommendations=10, num_bot_reco
 
     u_vector = solve_system(feature_matrix, deck_vector)
 
-    if not u_vector: # something went wrong
+    if len(u_vector) == 0: # something went wrong
         print('deck vector was empty')
         return
 
