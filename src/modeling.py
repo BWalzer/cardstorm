@@ -98,7 +98,7 @@ def make_recommender():
 
     OUTPUT:
         NONE
-        
+
     Does everything
 
         Get deck data from db
@@ -151,4 +151,4 @@ if __name__ == '__main__':
                    .appName('cardstorm modeling')
                    .getOrCreate())
 
-    do_everything()
+    make_recommender()
