@@ -29,7 +29,7 @@ img{max-width:100%;}
 /*end reset*/
 /****-----start-body----****/
 body{
-	background:url('../images/banner.jpg') no-repeat -83px 0px;
+	background:url('../images/background.jpeg');
 	text-align: center;
 	background-attachment: fixed;
     background-position: center;
