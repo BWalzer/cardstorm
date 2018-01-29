@@ -10,17 +10,19 @@ def submit_decklist():
     # get the deck_list
     request.form.get('deck_list')
 
-    # get the user choices
-    white_cards = request.form.get('white_cards')
-    blue_cards = request.form.get('blue_cards')
-    black_cards = request.form.get('black_cards')
-    red_cards = request.form.get('red_cards')
-    green_cards = request.form.get('green_cards')
-    land_cards = request.form.get('land_cards')
+    # # get the user choices
+    # white_cards = request.form.get('white_cards')
+    # blue_cards = request.form.get('blue_cards')
+    # black_cards = request.form.get('black_cards')
+    # red_cards = request.form.get('red_cards')
+    # green_cards = request.form.get('green_cards')
+    # land_cards = request.form.get('land_cards')
 
     print(type(white_cards))
     print(white_cards)
-    return render_template('index.html')
+
+
+    return jsonify()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', threaded=True)
