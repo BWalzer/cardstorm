@@ -26,6 +26,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 				</script>
 </head>
 <body>
+    <img src='https://s3-us-west-2.amazonaws.com/mtg-capstone/card_images/1.jpg'> 
 	<h1>cardstorm: a magic the gathering card recommender</h1>
 	<div class="main-content">
 
@@ -38,16 +39,16 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 					</ul>
 					<div class="agile-tb">
 						<div class="tab-1 resp-tab-content" aria-labelledby="tab_item-0">
-							<form action="#" method="post">
-								<textarea placeholder="Deck list goes here" required="" rows="15"></textarea>
-								<span class="checkbox1">
-									<label class="checkbox super"><input type="checkbox" name="" checked=""><i> </i>White Cards</label>
-                                    <label class="checkbox super"><input type="checkbox" name="" checked=""><i> </i>Blue Cards</label>
-                                    <label class="checkbox super"><input type="checkbox" name="" checked=""><i> </i>Black Cards</label>
-                                    <label class="checkbox super"><input type="checkbox" name="" checked=""><i> </i>Red Cards</label>
-                                    <label class="checkbox super"><input type="checkbox" name="" checked=""><i> </i>Green Cards</label>
-                                    <label class="checkbox super"><input type="checkbox" name="" checked=""><i> </i> Land Cards</label>
-								</span>
+							<form action="/recommendations" method="post">
+								<textarea placeholder="Deck list goes here" required="" rows="15" name="deck_list"></textarea>
+								<!-- <span class="checkbox1" name="user_choices">
+									<label class="checkbox super"><input type="checkbox" name="white_cards" checked=""><i> </i>White Cards</label>
+                                    <label class="checkbox super"><input type="checkbox" name="blue_cards" checked=""><i> </i>Blue Cards</label>
+                                    <label class="checkbox super"><input type="checkbox" name="black_cards" checked=""><i> </i>Black Cards</label>
+                                    <label class="checkbox super"><input type="checkbox" name="red_cards" checked=""><i> </i>Red Cards</label>
+                                    <label class="checkbox super"><input type="checkbox" name="green_cards" checked=""><i> </i>Green Cards</label>
+                                    <label class="checkbox super"><input type="checkbox" name="land_cards" checked=""><i> </i> Land Cards</label>
+								</span> -->
 
 								<input type="submit" value="Make Recommendations"/>
 							</form>
@@ -59,7 +60,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 	</div>
 
 	<div class="footer">
-		<p> &copy; 2017 Simple Tab Forms. All Rights Reserved | Design by <a href="http://w3layouts.com">W3layouts</a></p>
+		<!-- <p> &copy; 2017 Simple Tab Forms. All Rights Reserved | Design by <a href="http://w3layouts.com">W3layouts</a></p> -->
 	</div>
 	<script src="js/easyResponsiveTabs.js" type="text/javascript"></script>
 </body>

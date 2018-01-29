@@ -1,37 +1,31 @@
-from flask import Flask, render_template, request
-app = Flask(__name__)
+from flask import Flask, render_template, request, jsonify
+from predictions import make_recommendations
+app = Flask(__name__, static_url_path='')
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/input_card', methods = ['POST'])
+@app.route('/recommendations', methods = ['POST'])
 def submit_decklist():
     # get the deck_list
-    request.form.get('deck_list')
+    raw_deck_list = request.form.get('deck_list')
 
-    # get the user choices
-    white_cards = request.form.get('white_cards')
-    blue_cards = request.form.get('blue_cards')
-    black_cards = request.form.get('black_cards')
-    red_cards = request.form.get('red_cards')
-    green_cards = request.form.get('green_cards')
-    land_cards = request.form.get('land_cards')
+    print(raw_deck_list)
+    # # get the user choices
+    # white_cards = request.form.get('white_cards')
+    # blue_cards = request.form.get('blue_cards')
+    # black_cards = request.form.get('black_cards')
+    # red_cards = request.form.get('red_cards')
+    # green_cards = request.form.get('green_cards')
+    # land_cards = request.form.get('land_cards')
 
-    return render_template('index.html')
+    top_10 = make_recommendations(raw_deck_list, 10)
+    card_images = ['https://s3-us-west-2.amazonaws.com/mtg-capstone/card_images/{}.jpg'.format(cardstorm_id) for cardstorm_id in top_10]
 
-def get_recommendations(raw_deck_list, white_cards=True, blue_cards=True,
-                        black_cards=True, red_cards=True, green_cards=True, land_cards=True):
+    print(card_images)
 
-    '''
-    Everytime a user submtits a declist, I want to:
-        get the feature matrix
-        vectorize submitted deck list
-        get new ratings
-    '''
-
-
-
+    # return jsonify(image_1: )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', threaded=True)

@@ -161,7 +161,3 @@ def make_recommendations(raw_deck_list, num_top_recommendations=10):
     top_recommendations = top_n_recommendations(recommendations, deck_vector, all_cardstorm_ids, n=num_top_recommendations)
 
     return top_recommendations
-
-
-if __name__ == '__main__':
-    pass
