@@ -32,7 +32,10 @@ def deck_to_dict(deck_list, card_dict):
         if not card_string:
             break
         parse_status, card_name, card_count = parse_card_string(card_string)
-        cardstorm_id = card_dict[card_name.lower()]
+        try:
+            cardstorm_id = card_dict[card_name.lower()]
+        except KeyError:
+            print('card "{}" not found'.format(card_name))
         deck_dict[cardstorm_id] = int(card_count)
 
     return deck_dict

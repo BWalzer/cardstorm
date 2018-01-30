@@ -25,7 +25,20 @@ a{text-decoration:none;}
 .vertical-top{	vertical-align:top;}/* vertical align top */
 nav.vertical ul li{	display:block;}/* vertical menu */
 nav.horizontal ul li{	display: inline-block;}/* horizontal menu */
-img{max-width:100%;}
+img.cardRec{
+    height: 100%;
+    width: 100%;
+}
+div.cardBox{
+    max-width: 20%;
+    min-width: 10%;
+    display: block;
+    float: left;
+}
+div.cardBox:hover{
+    max-width: 60%;
+    width: 60%;
+}
 /*end reset*/
 /****-----start-body----****/
 body{
@@ -198,6 +211,27 @@ input[type="submit"] {
 	-o-transition: 0.5s all;
 	-ms-transition: 0.5s all;
 }
+button {
+    color: #fff;
+    background: #ce224d;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    outline: none;
+    margin: 30px auto 0 auto;
+	display:block;
+	cursor:pointer;
+	transition: 0.5s all;
+	-webkit-transition: 0.5s all;
+	-moz-transition: 0.5s all;
+	-o-transition: 0.5s all;
+	-ms-transition: 0.5s all;
+}
+button:hover{
+    background: #0068fe;
+}
+
+
 input[type="submit"]:hover{
     background: #0068fe;
 }

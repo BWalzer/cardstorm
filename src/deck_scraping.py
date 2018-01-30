@@ -89,8 +89,13 @@ def parse_card_string(card_string):
         - card_count: an int of the number of this card in the deck
     """
     if card_string:
-        card_count = re.search('(\d+)', card_string).group(1)
-        card_name = re.search(' (\D+)', card_string).group(1)
+        count_search = re.search('(\d+)', card_string)
+        if count_search: # card_count found
+            card_count = count_search.group(1)
+        else:
+            card_count = 1
+
+        card_name = re.search('(\D+)', card_string).group(1).strip()
 
         if ' / ' in card_name: # split cards. mtgtop8 formats these weirdly
             card_name = card_name.replace(' / ', ' // ')
