@@ -267,6 +267,7 @@ label.checkbox {
 }
 label.checkbox {
   display: inline-block;
+  margin: 5px;
 }
 .checkbox {
     position: relative;

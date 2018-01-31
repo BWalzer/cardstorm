@@ -9,7 +9,12 @@ def index():
 
 @app.route('/recommendations', methods = ['POST'])
 def get_recommendations():
-    raw_deck_list = request.get_data().decode()
+    user_submission = request.json
+
+    raw_deck_list = user_submission["deckList"]
+    filters = user_submission['filters']
+    print(filters)
+    print(type(filters))
 
     card_recommender = CardRecommender()
     card_recommender.fit(raw_deck_list)

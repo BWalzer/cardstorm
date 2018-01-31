@@ -29,10 +29,10 @@ License URL: http://creativecommons.org/licenses/by/3.0/
             filters = getFilters()
             $.ajax({
                 url: "/recommendations",
-                contentType: "text/plain",
+                contentType: "application/json",
                 type: "POST",
                 success: showRecs,
-                data: {"deckList": deckList, "filters": filters}
+                data: JSON.stringify({"deckList": deckList, "filters": filters})
             });
         }
 
@@ -55,11 +55,11 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 
         function getFilters(){
             land = $("#landFilter").val()
-            white = $("whiteFilter").val()
-            blue = $("blueFilter").val()
-            black = $("blackFilter").val()
-            red = $("redFilter").val()
-            green = $("greenFilter").val()
+            white = $("#whiteFilter").val()
+            blue = $("#blueFilter").val()
+            black = $("#blackFilter").val()
+            red = $("#redFilter").val()
+            green = $("#greenFilter").val()
 
             filters = {"land": land, "white": white, "blue": blue,
                        "black": black, "red": red, "green": green}
@@ -82,13 +82,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 					<div class="agile-tb">
 						<div class="tab-1 resp-tab-content" aria-labelledby="tab_item-0">
 								<textarea placeholder="Deck list goes here" rows="15" cols="50" id="deckList" required></textarea>
-								<span class="checkbox1" name="user_choices">
-                                    <label class="checkbox super"><input type="checkbox" id="landFilter" checked=""><i> </i>Land Cards</label>
-                                    <label class="checkbox super"><input type="checkbox" id="whiteFilter" checked=""><i> </i>White Cards</label>
-                                    <label class="checkbox super"><input type="checkbox" id="blueFilter" checked=""><i> </i>Blue Cards</label>
-                                    <label class="checkbox super"><input type="checkbox" id="blackFilter" checked=""><i> </i>Black Cards</label>
-                                    <label class="checkbox super"><input type="checkbox" id="redFilter" checked=""><i> </i>Red Cards</label>
-                                    <label class="checkbox super"><input type="checkbox" id="greenFilter" checked=""><i> </i>Green Cards</label>
+								<span class="checkbox1" name="cardFilters">
+                                    <label class="checkbox"><input type="checkbox" id="landFilter" checked=""><i> </i>Land Cards</label>
+                                    <label class="checkbox"><input type="checkbox" id="whiteFilter" checked=""><i> </i>White Cards</label>
+                                    <label class="checkbox"><input type="checkbox" id="blueFilter" checked=""><i> </i>Blue Cards</label>
+                                    <label class="checkbox"><input type="checkbox" id="blackFilter" checked=""><i> </i>Black Cards</label>
+                                    <label class="checkbox"><input type="checkbox" id="redFilter" checked=""><i> </i>Red Cards</label>
+                                    <label class="checkbox"><input type="checkbox" id="greenFilter" checked=""><i> </i>Green Cards</label>
 								</span>
 								<button id="submit-button" onclick="makeRecs()"> Make Recommendations </button>
 						</div>
