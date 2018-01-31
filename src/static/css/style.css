@@ -27,7 +27,7 @@ nav.vertical ul li{	display:block;}/* vertical menu */
 nav.horizontal ul li{	display: inline-block;}/* horizontal menu */
 /*end reset*/
 /****-----start-body----****/
-img{width: 20%;}
+img.cardRec{width: 20%;}
 body{
 	background:url('../images/brown_background.jpg');
 	text-align: center;
