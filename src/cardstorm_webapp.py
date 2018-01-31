@@ -13,9 +13,8 @@ def get_recommendations():
 
     raw_deck_list = user_submission["deckList"]
     filters = user_submission['filters']
-    print(filters)
-    print(type(filters))
 
+    print('\t{}'.format(raw_deck_list))
     card_recommender = CardRecommender()
     card_recommender.fit(raw_deck_list)
     recommendations= card_recommender.recommend(land_filter=filters['land'],
