@@ -184,7 +184,7 @@ class CardRecommender:
         Takes the recommendations and remove all colorless cards.
         '''
 
-        query = "SELECT cardstorm_id FROM cards WHERE array_length(colors, 1) IS NULL AND type_line NOT LIKE '%Land%'"
+        query = "SELECT cardstorm_id FROM cards WHERE array_length(colors, 1) IS NULL AND type_line NOT LIKE '%Land%//%'"
 
         self.cursor.execute(query)
 
