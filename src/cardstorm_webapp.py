@@ -1,32 +1,23 @@
 from flask import Flask, render_template, request, jsonify
-from predictions import make_recommendations
-app = Flask(__name__, static_url_path='')
+from predictions import CardRecommender
+
+app = Flask(__name__)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/recommendations', methods = ['POST'])
-def submit_decklist():
-    # get the deck_list
-    user_submission = request.get_data()
-    print(user_submission)
-    # raw_deck_list = user_submission['deckList']
-    # print(raw_deck_list)
+def get_recommendations():
+    raw_deck_list = request.get_data().decode()
 
-    # # get the user choices
-    # white_cards = request.form.get('white_cards')
-    # blue_cards = request.form.get('blue_cards')
-    # black_cards = request.form.get('black_cards')
-    # red_cards = request.form.get('red_cards')
-    # green_cards = request.form.get('green_cards')
-    # land_cards = request.form.get('land_cards')
+    card_recommender = CardRecommender()
+    card_recommender.fit(raw_deck_list)
+    recommendations= card_recommender.recommend()
 
-    top_10 = make_recommendations(user_submission.decode(), 10)
-    card_images = [f'http://mtg-capstone.s3-website-us-west-2.amazonaws.com/card_images/jpg/{cardstorm_id}.jpg' for cardstorm_id in top_10]
+    card_images = [f'http://mtg-capstone.s3-website-us-west-2.amazonaws.com/card_images/jpg/{cardstorm_id}.jpg' for cardstorm_id in recommendations[:10]]
 
     return jsonify(card_images)
-
 
 
 if __name__ == '__main__':
