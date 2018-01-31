@@ -54,15 +54,18 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         }
 
         function getFilters(){
-            land = $("#landFilter").val()
-            white = $("#whiteFilter").val()
-            blue = $("#blueFilter").val()
-            black = $("#blackFilter").val()
-            red = $("#redFilter").val()
-            green = $("#greenFilter").val()
+            document.getElementById("landFilter").checked
+
+            land = !document.getElementById("landFilter").checked
+            white = !document.getElementById("whiteFilter").checked
+            blue = !document.getElementById("blueFilter").checked
+            black = !document.getElementById("blackFilter").checked
+            red = !document.getElementById("redFilter").checked
+            green = !document.getElementById("greenFilter").checked
+            colorless = !document.getElementById("colorlessFilter").checked
 
             filters = {"land": land, "white": white, "blue": blue,
-                       "black": black, "red": red, "green": green}
+                       "black": black, "red": red, "green": green, "colorless": colorless}
 
             return filters
         }
@@ -89,6 +92,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                     <label class="checkbox"><input type="checkbox" id="blackFilter" checked=""><i> </i>Black Cards</label>
                                     <label class="checkbox"><input type="checkbox" id="redFilter" checked=""><i> </i>Red Cards</label>
                                     <label class="checkbox"><input type="checkbox" id="greenFilter" checked=""><i> </i>Green Cards</label>
+                                    <label class="checkbox"><input type="checkbox" id="colorlessFilter" checked=""><i> </i>Colorless Cards</label>
 								</span>
 								<button id="submit-button" onclick="makeRecs()"> Make Recommendations </button>
 						</div>

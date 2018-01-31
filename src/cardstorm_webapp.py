@@ -18,7 +18,10 @@ def get_recommendations():
 
     card_recommender = CardRecommender()
     card_recommender.fit(raw_deck_list)
-    recommendations= card_recommender.recommend()
+    recommendations= card_recommender.recommend(land_filter=filters['land'],
+                        white_filter=filters['white'], blue_filter=filters['blue'],
+                        black_filter=filters['black'], red_filter=filters['red'],
+                        green_filter=filters['green'], colorless_filter=filters['colorless'])
 
     card_images = [f'http://mtg-capstone.s3-website-us-west-2.amazonaws.com/card_images/jpg/{cardstorm_id}.jpg' for cardstorm_id in recommendations[:10]]
 

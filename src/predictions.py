@@ -66,7 +66,7 @@ class CardRecommender:
         # recreated user deck list
         self.d_vector = np.dot(u_vector, self.feature_matrix.T)
 
-    def recommend(self, land_filter=False, white_filter=False, blue_filter=False, black_filter=False, red_filter=False, green_filter=False):
+    def recommend(self, land_filter=False, white_filter=False, blue_filter=False, black_filter=False, red_filter=False, green_filter=False, colorless_filter=False):
         '''
         Takes the dot product of u and V to get new ratings for the 'd' vector.
         '''
@@ -84,6 +84,8 @@ class CardRecommender:
             recommendations = self._filter_red(recommendations)
         if green_filter:
             recommendations = self._filter_green(recommendations)
+        if colorless_filter:
+            recommendations = self._filter_colorless(recommendations)
 
         return recommendations
 
@@ -94,9 +96,9 @@ class CardRecommender:
 
         query = "SELECT cardstorm_id FROM cards WHERE type_line LIKE '%Land%' AND NOT type_line LIKE '%//%Land%'"
 
-        cursor.execute(query)
+        self.cursor.execute(query)
 
-        land_ids = {_[0] for _ in cursor.fetchall()}
+        land_ids = {_[0] for _ in self.cursor.fetchall()}
 
         filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in land_ids]
 
@@ -109,11 +111,11 @@ class CardRecommender:
 
         query = "SELECT cardstorm_id FROM cards WHERE 'R'=ANY(colors)"
 
-        cursor.execute(query)
+        self.cursor.execute(query)
 
-        white_ids = {_[0] for _ in cursor.fetchall()}
+        white_ids = {_[0] for _ in self.cursor.fetchall()}
 
-        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in land_ids]
+        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in white_ids]
 
         return filtered_recommendations
 
@@ -124,11 +126,11 @@ class CardRecommender:
 
         query = "SELECT cardstorm_id FROM cards WHERE 'U'=ANY(colors)"
 
-        cursor.execute(query)
+        self.cursor.execute(query)
 
-        blue_ids = {_[0] for _ in cursor.fetchall()}
+        blue_ids = {_[0] for _ in self.cursor.fetchall()}
 
-        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in land_ids]
+        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in blue_ids]
 
         return filtered_recommendations
 
@@ -139,11 +141,11 @@ class CardRecommender:
 
         query = "SELECT cardstorm_id FROM cards WHERE 'B'=ANY(colors)"
 
-        cursor.execute(query)
+        self.cursor.execute(query)
 
-        black_ids = {_[0] for _ in cursor.fetchall()}
+        black_ids = {_[0] for _ in self.cursor.fetchall()}
 
-        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in land_ids]
+        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in black_ids]
 
         return filtered_recommendations
 
@@ -154,11 +156,11 @@ class CardRecommender:
 
         query = "SELECT cardstorm_id FROM cards WHERE 'R'=ANY(colors)"
 
-        cursor.execute(query)
+        self.cursor.execute(query)
 
-        red_ids = {_[0] for _ in cursor.fetchall()}
+        red_ids = {_[0] for _ in self.cursor.fetchall()}
 
-        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in land_ids]
+        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in red_ids]
 
         return filtered_recommendations
 
@@ -169,13 +171,29 @@ class CardRecommender:
 
         query = "SELECT cardstorm_id FROM cards WHERE 'G'=ANY(colors)"
 
-        cursor.execute(query)
+        self.cursor.execute(query)
 
-        green_ids = {_[0] for _ in cursor.fetchall()}
+        green_ids = {_[0] for _ in self.cursor.fetchall()}
 
-        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in land_ids]
+        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in green_ids]
 
         return filtered_recommendations
+
+    def _filter_colorless(self, recommendations):
+        '''
+        Takes the recommendations and remove all colorless cards.
+        '''
+
+        query = "SELECT cardstorm_id FROM cards WHERE array_length(colors, 1) IS NULL AND type_line NOT LIKE '%Land%'"
+
+        self.cursor.execute(query)
+
+        colorless_ids = {_[0] for _ in self.cursor.fetchall()}
+
+        filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in colorless_ids]
+
+        return filtered_recommendations
+
 
     def _vectorize_deck(self, deck_dict):
         '''
