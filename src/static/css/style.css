@@ -25,22 +25,9 @@ a{text-decoration:none;}
 .vertical-top{	vertical-align:top;}/* vertical align top */
 nav.vertical ul li{	display:block;}/* vertical menu */
 nav.horizontal ul li{	display: inline-block;}/* horizontal menu */
-img.cardRec{
-    height: 100%;
-    width: 100%;
-}
-div.cardBox{
-    max-width: 20%;
-    min-width: 10%;
-    display: block;
-    float: left;
-}
-div.cardBox:hover{
-    max-width: 60%;
-    width: 60%;
-}
 /*end reset*/
 /****-----start-body----****/
+img{width: 20%;}
 body{
 	background:url('../images/brown_background.jpg');
 	text-align: center;

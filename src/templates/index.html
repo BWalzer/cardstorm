@@ -36,13 +36,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         }
 
         function showRecs(rec_ids) {
-            recs_html=""
+            recs_html="<div>"
             rec_ids.forEach(function(url) {
-                recs_html += '<div class="cardBox"> <img class="cardRec" style="display: inline;" src="'
+                recs_html += '<img style="display: inline;" src="'
                 recs_html += url
-                recs_html += '"  /> </div>'
+                recs_html += '"  />'
             })
-            // recs_html += "</div>"
+            recs_html += "</div>"
 
             cardsDiv = $("div#cards")
             cardsDiv.html(recs_html)
