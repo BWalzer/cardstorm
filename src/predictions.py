@@ -109,7 +109,7 @@ class CardRecommender:
         Takes the recommendations and remove all white cards.
         '''
 
-        query = "SELECT cardstorm_id FROM cards WHERE 'R'=ANY(colors)"
+        query = "SELECT cardstorm_id FROM cards WHERE 'W'=ANY(colors)"
 
         self.cursor.execute(query)
 
