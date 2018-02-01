@@ -34,10 +34,12 @@ class CardRecommender:
         feature_matrix = []
 
         for cardstorm_id, features in self.cursor.fetchall():
+            print('\tappending feature_matrix row')
             feature_matrix.append(features)
 
         feature_matrix = np.array(feature_matrix)
 
+        print('feature_matrix shape in _get_feature_matrix(): {}'.format(feature_matrix.shape))
         return feature_matrix
 
     def fit(self, raw_deck_list):
@@ -52,6 +54,9 @@ class CardRecommender:
         deck_dict = self._deck_to_dict(raw_deck_list)
         self.deck_vector = self._vectorize_deck(deck_dict)
 
+
+        print('feature_matrix shape in fit(): {}'.format(self.feature_matrix.shape))
+        print('deck_vector shape in fit(): {}'.format(self.deck_vector.shape))
         # u vector from the equation d = u*V
         u_vector = np.linalg.lstsq(self.feature_matrix, self.deck_vector)[0]
 
@@ -210,6 +215,7 @@ class CardRecommender:
                 deck_vector.append(0)
 
         deck_vector = np.array(deck_vector)
+        print('deck_vector shape in _vectorize_deck(): {}'.format(deck_vector.shape))
 
         return deck_vector
 
@@ -237,6 +243,7 @@ class CardRecommender:
             try:
                 cardstorm_id = self.card_dict[card_name.lower()]
             except KeyError:
+                print('asdf')
                 print('card "{}" not found'.format(card_name))
             deck_dict[cardstorm_id] = int(card_count)
 

@@ -32,6 +32,14 @@ p.helpText{
     color: white;
     font-size: 20px;
     text-align: left;
+    background: rgba(255, 255, 255, 0.35);
+    width: 92%;
+    padding: 15px;
+    border: none;
+    margin-bottom: 20px;
+    font-size: 16px;
+    outline: none;
+    color: #ffffff;
 }
 img.cardRec{width: 20%;}
 body{
@@ -184,7 +192,7 @@ textarea{
     font-size: 16px;
     outline: none;
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.35);
 	min-height:100px;
 	font-family: 'Ropa Sans', sans-serif;
 }

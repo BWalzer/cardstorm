@@ -74,8 +74,11 @@ def upload_product_rdd(product_rdd):
     '''
     current_date = str(datetime.date.today())
 
-    cursor.execute('SELECT MAX(run_id)+1 FROM product_matrices_v2')
-    run_id = cursor.fetchall()[0]
+    cursor.execute('SELECT MAX(run_id) FROM product_matrices_v2')
+    run_id = cursor.fetchone()[0]
+    if run_id is None:
+        run_id = 0
+    run_id += 1
 
     for cardstorm_id, features in product_rdd.toDF().collect():
         query = '''INSERT INTO product_matrices_v2 (cardstorm_id, features, date, run_id)
@@ -114,7 +117,6 @@ def make_recommender():
         get the product matrix
         upload df to db
     '''
-    print('beginning modeling process')
 
     ratings_schema = StructType([StructField('deck_id', IntegerType()),
                                  StructField('cardstorm_id', IntegerType()),
@@ -130,7 +132,7 @@ def make_recommender():
                                            schema=ratings_schema)
     ratings_df = incomplete_ratings.union(filler_ratings)
 
-    model = ALS.trainImplicit(ratings=ratings_df, rank=160)
+    model = ALS.trainImplicit(ratings=ratings_df, rank=80)
 
     product_rdd = model.productFeatures()
 
