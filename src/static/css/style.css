@@ -27,6 +27,12 @@ nav.vertical ul li{	display:block;}/* vertical menu */
 nav.horizontal ul li{	display: inline-block;}/* horizontal menu */
 /*end reset*/
 /****-----start-body----****/
+p.helpText{
+    font-family:'Ropa Sans', sans-serif;
+    color: white;
+    font-size: 20px;
+    text-align: left;
+}
 img.cardRec{width: 20%;}
 body{
 	background:url('../images/brown_background.jpg');
