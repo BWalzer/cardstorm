@@ -15,3 +15,11 @@ Ideas to think about:
 
     - store all card images in an s3 bucket, name as 'carstorm_id.jpg'
     - re-scrape everything before final product
+
+
+
+TESTING:
+    - rank=360 is way too much. It definitely overfitting. It's nice how quickly it picks up on the deck though
+    - rank=10 is way too low
+    - rank=80 looks okay, not great though. recommends thoughtcast for UW control deck (weird)
+    - rank=160 looks pretty good. finds delver deck
