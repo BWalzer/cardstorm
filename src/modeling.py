@@ -130,7 +130,7 @@ def make_recommender():
                                            schema=ratings_schema)
     ratings_df = incomplete_ratings.union(filler_ratings)
 
-    model = ALS.trainImplicit(ratings=ratings_df, rank=40)
+    model = ALS.trainImplicit(ratings=ratings_df, rank=160)
 
     product_rdd = model.productFeatures()
 
