@@ -23,3 +23,22 @@ TESTING:
     - rank=10 is way too low
     - rank=80 looks okay, not great though. recommends thoughtcast for UW control deck (weird)
     - rank=160 looks pretty good. finds delver deck
+
+    rank=40:
+        - in: 4 delver of secrets (time: 1.71s)
+            - out: mana leak, young pyromancer, lightning bolt, tasigur, thought sour, spell snare, terminate, murderous cut, collective brutality
+        - in: 4 lantern (time: 1.53s)
+            - out: academy ruins, ensnaring bridge, pithing needle, codex shredder, pyxis of pandemonium, mox opal, glimmervoid, ghoulcaller's bell, inventor's fair, ancient stirrings
+        - in: 4 ancient stirrings (time: 3.07s)
+            - out: forest, chromatic star, chromatic sphere, sylvan scrying, grove of the burnwillows, brushland, yavimaya coast, engineered explosives, drowner of hope, world breaker
+    rank=80:
+        -in: 4 delver of Secrets
+            - out: mana leak, young pyromancer, darkslick shores, murderous cut, electrolyze, gurmag angler, thought scour, vapor snag, spell pierce, spell snare
+        - in: 4 lantern of insight
+            - out: ensnaring bridge, pithing needle, codex shredder, academy ruins, glimmervoid, ghoulcaller's bell, mox opal, surgical extraction, inventor's fair
+        - in: 4 ancient stirrings
+            - out: forest, grove of the burn willows, world breaker, engineered explosives, yavimaya coast, chromatic star, chromatic sphere, sylvan scrying, karpsulan forest
+    rank=160:
+        - in: 4 delver of Secrets
+            - out: young pyromancer, vapor snag, mana leak, electrolyze, thought scour, darkslick shores, spell snare, murderous cut, gurmag angler, deprive
+        - in: 4 lantern of insight

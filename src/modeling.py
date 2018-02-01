@@ -132,7 +132,7 @@ def make_recommender():
                                            schema=ratings_schema)
     ratings_df = incomplete_ratings.union(filler_ratings)
 
-    model = ALS.trainImplicit(ratings=ratings_df, rank=80)
+    model = ALS.trainImplicit(ratings=ratings_df, rank=30)
 
     product_rdd = model.productFeatures()
 
@@ -141,7 +141,7 @@ def make_recommender():
     if upload_status: conn.commit()
 
 if __name__ == '__main__':
-    global dbname, hoest, username, password, conn, cursor, spark
+    global dbname, host, username, password, conn, cursor, spark
     dbname = os.environ['CAPSTONE_DB_DBNAME']
     host = os.environ['CAPSTONE_DB_HOST']
     username = os.environ['CAPSTONE_DB_USERNAME']

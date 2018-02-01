@@ -27,24 +27,24 @@ nav.vertical ul li{	display:block;}/* vertical menu */
 nav.horizontal ul li{	display: inline-block;}/* horizontal menu */
 /*end reset*/
 /****-----start-body----****/
+
 p.helpText{
-    font-family:'Ropa Sans', sans-serif;
-    color: white;
-    font-size: 20px;
     text-align: left;
-    background: rgba(255, 255, 255, 0.35);
     width: 92%;
     padding: 15px;
     border: none;
-    margin-bottom: 20px;
     font-size: 16px;
     outline: none;
     color: #ffffff;
+    background: rgba(255,255, 255, .2);
+	min-height:100px;
+	font-family: 'Ropa Sans', sans-serif;
 }
 img.cardRec{width: 20%;}
 body{
-	background:url('../images/brown_background.jpg');
+	/* background:url('../images/brown_background.jpg'); */
 	text-align: center;
+    background-color: #612d05;
 	background-attachment: fixed;
     background-position: center;
     background-size: cover;
@@ -57,17 +57,23 @@ body{
 h1 {
     padding-top: 60px;
     color: white;
-    font-size: 50px;
+    font-size: 70px;
     font-family: 'Ropa Sans', sans-serif;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     letter-spacing: 5px;
+}
+h2 {
+    padding-top: 10px;
+    color: white;
+    font-size: 30px;
+    font-family: 'Ropa Sans', sans-serif;
 }
 .main-content {
     width: 32%;
     margin: 60px auto;
 }
 .agile-tb {
-    border: 2px solid rgba(255, 255, 255, 0.21);
+    border: 4px solid #428aff;
     padding: 40px 40px;
 }
 .left-agile{
@@ -141,7 +147,7 @@ div#horizontalTab ul{
     display: inline-block;
     list-style: none;
     outline: none;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     -webkit-transition: all 0.3s ease-out;
     -moz-transition: all 0.3s ease-out;
     -ms-transition: all 0.3s ease-out;
@@ -152,8 +158,10 @@ div#horizontalTab ul{
 }
 .resp-tab-active {
 	text-shadow: none;
-    background: #ce224d;
+    background: #c79910;
 	-khtml-border-radius: 3px;
+    border: 2px solid #428aff;
+    border-bottom: none;
 }
 
 .super {
@@ -192,7 +200,7 @@ textarea{
     font-size: 16px;
     outline: none;
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(255,255, 255, .2);
 	min-height:100px;
 	font-family: 'Ropa Sans', sans-serif;
 }
@@ -215,7 +223,7 @@ input[type="submit"] {
 }
 button {
     color: #fff;
-    background: #ce224d;
+    background: #c79910;
     padding: 12px 20px;
     font-size: 16px;
     border: none;
@@ -230,7 +238,7 @@ button {
 	-ms-transition: 0.5s all;
 }
 button:hover{
-    background: #0068fe;
+    background: rgba(199, 153, 16, 0.5);
 }
 
 input[type="submit"]:hover{
@@ -247,7 +255,7 @@ ul li input[type="checkbox"]+label {
 	position: relative;
 	padding-left: 25px;
 	border: #ce224d;
-	color:#ce224d;
+	color: white;
 	display: inline-block;
 	font-size: 13px;
 
@@ -261,7 +269,7 @@ ul li input[type="checkbox"]+label span:first-child {
 	top: 1px;
 	left: 4px;
 	bottom: 4px;
-	background:#ce224d;
+	background: white;
 }
 ul li input[type="checkbox"]:checked+label span:first-child:before {
 	content: "";
@@ -287,7 +295,7 @@ label.checkbox {
     position: relative;
     font-size: 0.95em;
     font-weight: normal;
-    color:#ce224d;
+    color: white;
     padding: 0em 0.5em 0em 2em;
 }
 .checkbox i {
@@ -298,13 +306,13 @@ label.checkbox {
     width: 18px;
     height: 18px;
     outline: none;
-    background:#ce224d;
-    border: 1px solid #ce224d;
+    background:#c79910;
+    border: 1px solid #c79910;
 }
 .checkbox i {
     font-size: 20px;
     font-weight: 400;
-    color: #999;
+    color: #c79910;
     font-style: normal;
 }
 .checkbox input:checked + i:after {
