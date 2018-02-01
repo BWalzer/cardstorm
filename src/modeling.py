@@ -74,12 +74,15 @@ def upload_product_rdd(product_rdd):
     '''
     current_date = str(datetime.date.today())
 
+    cursor.execute('SELECT MAX(run_id)+1 FROM product_matrices_v2')
+    run_id = cursor.fetchall()[0]
+
     for cardstorm_id, features in product_rdd.toDF().collect():
-        query = '''INSERT INTO product_matrices (cardstorm_id, features, date)
-                   VALUES (%s, %s, %s)'''
+        query = '''INSERT INTO product_matrices_v2 (cardstorm_id, features, date, run_id)
+                   VALUES (%s, %s, %s, %s)'''
 
         try:
-            cursor.execute(query, vars=[cardstorm_id, features, current_date])
+            cursor.execute(query, vars=[cardstorm_id, features, current_date, run_id])
         except psycopg2.IntegrityError:
             return False
             continue
@@ -127,7 +130,7 @@ def make_recommender():
                                            schema=ratings_schema)
     ratings_df = incomplete_ratings.union(filler_ratings)
 
-    model = ALS.trainImplicit(ratings=ratings_df, rank=10)
+    model = ALS.trainImplicit(ratings=ratings_df, rank=40)
 
     product_rdd = model.productFeatures()
 
