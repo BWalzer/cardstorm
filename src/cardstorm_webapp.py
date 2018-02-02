@@ -17,7 +17,6 @@ def get_recommendations():
     print('\t{}'.format(raw_deck_list))
     print('\t{}'.format(filters))
     card_recommender = CardRecommender()
-    # card_recommender.fit(raw_deck_list)
     recommendations = card_recommender.recommend(raw_deck_list, land_filter=filters['land'],
                         white_filter=filters['white'], blue_filter=filters['blue'],
                         black_filter=filters['black'], red_filter=filters['red'],

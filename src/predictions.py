@@ -67,6 +67,7 @@ class CardRecommender:
         Takes the dot product of u and V to get new ratings for the 'd' vector.
         '''
         self._fit(raw_deck_list)
+        # print('raw: {}'.format(raw_deck_list))
 
         if raw_deck_list == '':
             self.cursor.execute('SELECT cardstorm_id, SUM(card_count) FROM decks GROUP BY cardstorm_id ORDER BY sum DESC')
@@ -74,6 +75,7 @@ class CardRecommender:
         else:
             recommendations = self.all_cardstorm_ids[np.argsort(self.d_vector - self.deck_vector)[::-1]]
 
+        # print('pre filter: {}'.format(len(recommendations)))
         if land_filter:
             recommendations = self._filter_lands(recommendations)
         if white_filter:
@@ -89,6 +91,7 @@ class CardRecommender:
         if colorless_filter:
             recommendations = self._filter_colorless(recommendations)
 
+        # print('post filter: {}'.format(len(recommendations)))
         return recommendations
 
     def _filter_lands(self, recommendations):
@@ -101,7 +104,7 @@ class CardRecommender:
         self.cursor.execute(query)
 
         land_ids = {_[0] for _ in self.cursor.fetchall()}
-
+        # print('land_ids: {}'.format(len(land_ids)))
         filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in land_ids]
 
         return filtered_recommendations
@@ -111,13 +114,15 @@ class CardRecommender:
         Takes the recommendations and remove all white cards.
         '''
 
-        query = "SELECT cardstorm_id FROM cards WHERE 'W'=ANY(colors)"
+        query = "SELECT cardstorm_id FROM cards WHERE 'W'=ANY(colors) AND type_line NOT LIKE '%Land%//%'"
 
         self.cursor.execute(query)
 
         white_ids = {_[0] for _ in self.cursor.fetchall()}
-
+        # print('white: {}'.format(len(white_ids)))
+        # print('\tpre-white: {}'.format(len(recommendations)))
         filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in white_ids]
+        # print('\tpost-white: {}'.format(len(filtered_recommendations)))
 
         return filtered_recommendations
 
@@ -126,13 +131,16 @@ class CardRecommender:
         Takes the recommendations and remove all blue cards.
         '''
 
-        query = "SELECT cardstorm_id FROM cards WHERE 'U'=ANY(colors)"
+        query = "SELECT cardstorm_id FROM cards WHERE 'U'=ANY(colors) AND type_line NOT LIKE '%Land%//%'"
 
         self.cursor.execute(query)
 
         blue_ids = {_[0] for _ in self.cursor.fetchall()}
+        # print('blue: {}'.format(len(blue_ids)))
 
+        # print('\tpre-blue: {}'.format(len(recommendations)))
         filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in blue_ids]
+        # print('\tpost-blue: {}'.format(len(filtered_recommendations)))
 
         return filtered_recommendations
 
@@ -141,13 +149,16 @@ class CardRecommender:
         Takes the recommendations and remove all black cards.
         '''
 
-        query = "SELECT cardstorm_id FROM cards WHERE 'B'=ANY(colors)"
+        query = "SELECT cardstorm_id FROM cards WHERE 'B'=ANY(colors) AND type_line NOT LIKE '%Land%//%'"
 
         self.cursor.execute(query)
 
         black_ids = {_[0] for _ in self.cursor.fetchall()}
+        # print('black: {}'.format(len(black_ids)))
 
+        # print('\tpre-black: {}'.format(len(recommendations)))
         filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in black_ids]
+        # print('\tpost-black: {}'.format(len(filtered_recommendations)))
 
         return filtered_recommendations
 
@@ -156,13 +167,17 @@ class CardRecommender:
         Takes the recommendations and remove all red cards.
         '''
 
-        query = "SELECT cardstorm_id FROM cards WHERE 'R'=ANY(colors)"
+        query = "SELECT cardstorm_id FROM cards WHERE 'R'=ANY(colors) AND type_line NOT LIKE '%Land%//%'"
 
         self.cursor.execute(query)
 
         red_ids = {_[0] for _ in self.cursor.fetchall()}
 
+        # print('red: {}'.format(len(red_ids)))
+
+        # print('\tpre-red: {}'.format(len(recommendations)))
         filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in red_ids]
+        # print('\tpost-red: {}'.format(len(filtered_recommendations)))
 
         return filtered_recommendations
 
@@ -171,13 +186,17 @@ class CardRecommender:
         Takes the recommendations and remove all green cards.
         '''
 
-        query = "SELECT cardstorm_id FROM cards WHERE 'G'=ANY(colors)"
+        query = "SELECT cardstorm_id FROM cards WHERE 'G'=ANY(colors) AND type_line NOT LIKE '%Land%//%'"
 
         self.cursor.execute(query)
 
         green_ids = {_[0] for _ in self.cursor.fetchall()}
 
+        # print('green: {}'.format(len(green_ids)))
+
+        # print('\tpre-green: {}'.format(len(recommendations)))
         filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in green_ids]
+        # print('\tpost-green: {}'.format(len(filtered_recommendations)))
 
         return filtered_recommendations
 
@@ -186,13 +205,16 @@ class CardRecommender:
         Takes the recommendations and remove all colorless cards.
         '''
 
-        query = "SELECT cardstorm_id FROM cards WHERE array_length(colors, 1) IS NULL AND type_line NOT LIKE '%Land%//%'"
+        query = "SELECT cardstorm_id FROM cards WHERE array_length(colors, 1) IS NULL AND type_line NOT LIKE '%Land%//%' AND type_line NOT LIKE '%Land%'"
 
         self.cursor.execute(query)
 
         colorless_ids = {_[0] for _ in self.cursor.fetchall()}
+        # print('colorless: {}'.format(len(colorless_ids)))
 
+        # print('\tpre-colorless: {}'.format(len(recommendations)))
         filtered_recommendations = [cardstorm_id for cardstorm_id in recommendations if not cardstorm_id in colorless_ids]
+        # print('\tpost-colorless: {}'.format(len(filtered_recommendations)))
 
         return filtered_recommendations
 
