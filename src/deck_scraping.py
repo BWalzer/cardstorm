@@ -374,4 +374,4 @@ def scrape_decklists(front_pages=[0], verbose=False):
 
 
 if __name__ == '__main__':
-    scrape_decklists(verbose=True, front_pages=range(2))
+    scrape_decklists(verbose=True, front_pages=range(5))
