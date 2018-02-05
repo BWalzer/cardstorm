@@ -209,9 +209,8 @@ def scrape_modern_cards(verbose=False):
             if status:
                 conn.commit()
             else:
-                conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname, hostname, username, password))
+                conn.rollback()
                 cursor = conn.cursor()
-
         if not json_response['has_more']:
             if verbose: print('all done!')
             break

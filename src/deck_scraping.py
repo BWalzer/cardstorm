@@ -369,7 +369,7 @@ def scrape_decklists(front_pages=[0], verbose=False):
                 if success:
                     conn.commit()
                 else:
-                    conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname, host, username, password))
+                    conn.rollback()
                     cursor = conn.cursor()
 
 
