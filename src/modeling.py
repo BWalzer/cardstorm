@@ -140,7 +140,7 @@ def make_recommender():
 
     if upload_status: conn.commit()
 
-if __name__ == '__main__':
+def main():
     global dbname, host, username, password, conn, cursor, spark
     dbname = os.environ['CAPSTONE_DB_DBNAME']
     host = os.environ['CAPSTONE_DB_HOST']
@@ -157,3 +157,8 @@ if __name__ == '__main__':
                    .getOrCreate())
 
     make_recommender()
+
+    conn.close()
+
+if __name__ == '__main__':
+    main()

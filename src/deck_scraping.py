@@ -372,6 +372,8 @@ def scrape_decklists(front_pages=[0], verbose=False):
                     conn.rollback()
                     cursor = conn.cursor()
 
+    conn.close()
+
 
 if __name__ == '__main__':
     scrape_decklists(verbose=True, front_pages=range(5))

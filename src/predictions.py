@@ -55,6 +55,8 @@ class CardRecommender:
 
 
         # u vector from the equation d = u*V
+        print('feature_matrix: {}'.format(self.feature_matrix.shape))
+        print('deck_vector: {}'.format(self.deck_vector.shape))
         u_vector = np.linalg.lstsq(self.feature_matrix, self.deck_vector)[0]
 
         # recreated user deck list
@@ -91,7 +93,9 @@ class CardRecommender:
         if colorless_filter:
             recommendations = self._filter_colorless(recommendations)
 
-        # print('post filter: {}'.format(len(recommendations)))
+        # close connection when done
+        self.conn.close()
+
         return recommendations
 
     def _filter_lands(self, recommendations):
