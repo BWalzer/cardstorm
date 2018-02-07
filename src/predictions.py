@@ -55,8 +55,8 @@ class CardRecommender:
 
 
         # u vector from the equation d = u*V
-        print('feature_matrix: {}'.format(self.feature_matrix.shape))
-        print('deck_vector: {}'.format(self.deck_vector.shape))
+        # print('feature_matrix: {}'.format(self.feature_matrix.shape))
+        # print('deck_vector: {}'.format(self.deck_vector.shape))
         u_vector = np.linalg.lstsq(self.feature_matrix, self.deck_vector)[0]
 
         # recreated user deck list
