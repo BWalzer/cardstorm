@@ -14,7 +14,7 @@ Each of these steps are performed independently, on an Amazon EC2 instance and i
 
 1. Using [scryfall](https://scryfall.com)'s API, a table of all Modern-legal cards is created in the PostgreSQL database. A new unique identifier is created, as there are various problems with previous unique identifiers. 
 
-	The table of cards is updated daily, befor new deck lists are scraped.
+	The table of cards is updated daily, before new deck lists are scraped.
 
 2. Deck lists (training data) are scraped from [mtgtop8](http://mtgtop8.com)'s Modern section. Each deck list is broken up into `(deck_id, card_id, card_count)` tuples in preparation of the modeling process, and inserted in to the PostgreSQL database. `card_count` is the number of copies of a unique card including in a deck (max four with a few exceptions), and it is used as a user's implicit rating of the card.
 	New deck lists are scraped daily.
