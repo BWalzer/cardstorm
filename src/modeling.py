@@ -3,8 +3,9 @@ import psycopg2
 import os
 import datetime
 import multiprocessing
-from pyspark.mllib.recommendation import ALS
+# from pyspark.mllib.recommendation import ALS
 from pyspark.sql.types import StructField, StructType, IntegerType
+from pyspark.ml.recommendation import ALS
 
 def get_deck_card_counts(schema):
     '''
@@ -80,7 +81,7 @@ def upload_product_rdd(product_rdd):
         run_id = 0
     run_id += 1
 
-    for cardstorm_id, features in product_rdd.toDF().collect():
+    for cardstorm_id, features in product_rdd.collect():
         query = '''INSERT INTO product_matrices (cardstorm_id, features, date, run_id)
                    VALUES (%s, %s, %s, %s)'''
 
@@ -132,11 +133,14 @@ def make_recommender():
                                            schema=ratings_schema)
     ratings_df = incomplete_ratings.union(filler_ratings)
 
-    model = ALS.trainImplicit(ratings=ratings_df, rank=30)
+    # model = ALS.trainImplicit(ratings=ratings_df, rank=30)
+    model = ALS(rank=30, implicitPrefs=True, userCol='deck_id', maxIter=20,
+                itemCol='cardstorm_id', ratingCol='card_count')
+    fitted_model = model.fit(ratings_df)
 
-    product_rdd = model.productFeatures()
+    product_df = fitted_model.itemFactors
 
-    upload_status = upload_product_rdd(product_rdd)
+    upload_status = upload_product_rdd(product_df)
 
     if upload_status: conn.commit()
 
