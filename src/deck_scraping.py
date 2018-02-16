@@ -8,15 +8,6 @@ from bs4 import BeautifulSoup
 import psycopg2
 import os
 
-dbname = os.environ['CAPSTONE_DB_DBNAME']
-host = os.environ['CAPSTONE_DB_HOST']
-username = os.environ['CAPSTONE_DB_USERNAME']
-password = os.environ['CAPSTONE_DB_PASSWORD']
-
-conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname, host, username, password))
-cursor = conn.cursor()
-
-
 class ReflexiveDict():
 
     def __init__(self):
@@ -37,25 +28,35 @@ class ReflexiveDict():
         return key in self._dict
 
     def _get_cards(self):
-        query = 'Select name, cardstorm_id FROM cards'
+        dbname_ = os.environ['CARDSTORM_DB_DBNAME']
+        host_ = os.environ['CARDSTORM_DB_HOST']
+        username_ = os.environ['CARDSTORM_DB_USERNAME']
+        password_ = os.environ['CARDSTORM_DB_PASSWORD']
+
+        conn_ = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname_, host_, username_, password_))
+        cursor_ = conn_.cursor()
+
+        query = '''SELECT name, cardstorm_id
+                   FROM cards'''
 
         try:
-            cursor.execute(query)
+            cursor_.execute(query)
 
-            for name, cardstorm_id in cursor.fetchall():
+            for name, cardstorm_id in cursor_.fetchall():
                 self[name] = cardstorm_id
         except:
             return False
 
         return True
 
+    def __len__(self):
+        return len(self._dict)
+
     def get_cardstorm_ids(self):
         all_cardstorm_ids = [key for key in self.keys() if isinstance(key, int)]
 
         return np.array(sorted(all_cardstorm_ids))
 
-# dictionary of every modern legal card
-card_dict = ReflexiveDict()
 
 def format_deck(raw_deck_list):
     """
@@ -125,7 +126,7 @@ def make_user_card_counts(event_id, deck_id, deck_list,verbose=False):
         if not cardstorm_id: # could not find cardstorm_id, most likely not a valid card
             continue
         if parse_success:
-            user_card_count.append((int(event_id), int(deck_id), cardstorm_id, card_name, card_count))
+            user_card_count.append((int(event_id), int(deck_id), cardstorm_id, card_count))
 
     return user_card_count
 
@@ -144,7 +145,7 @@ def upload_user_card_counts(user_card_counts, verbose=False):
     '''
 
     template = ', '.join(['%s'] * len(user_card_counts))
-    query = 'INSERT INTO decks (event_id, deck_id, cardstorm_id, card_name, card_count) VALUES {}'.format(template)
+    query = 'INSERT INTO decks (event_id, deck_id, cardstorm_id, card_count) VALUES {}'.format(template)
 
     try:
         cursor.execute(query=query, vars=user_card_counts)
@@ -374,6 +375,21 @@ def scrape_decklists(front_pages=[0], verbose=False):
 
     conn.close()
 
+def main():
+    global dbname, host, username, password, conn, cursor, card_dict
+
+    dbname = os.environ['CARDSTORM_DB_DBNAME']
+    host = os.environ['CARDSTORM_DB_HOST']
+    username = os.environ['CARDSTORM_DB_USERNAME']
+    password = os.environ['CARDSTORM_DB_PASSWORD']
+
+    conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname, host, username, password))
+    cursor = conn.cursor()
+
+    card_dict = ReflexiveDict()
+
+    scrape_decklists(verbose=True, front_pages=range(5))
+
 
 if __name__ == '__main__':
-    scrape_decklists(verbose=True, front_pages=range(5))
+    main()

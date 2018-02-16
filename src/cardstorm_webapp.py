@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from predictions import CardRecommender
+import time
 
 app = Flask(__name__)
 
@@ -9,6 +10,7 @@ def index():
 
 @app.route('/recommendations', methods = ['POST'])
 def get_recommendations():
+    start_time = time.time()
     user_submission = request.json
 
     raw_deck_list = user_submission["deckList"]
@@ -24,6 +26,9 @@ def get_recommendations():
 
     card_images = [f'http://mtg-capstone.s3-website-us-west-2.amazonaws.com/card_images/jpg/{cardstorm_id}.jpg' for cardstorm_id in recommendations[:10]]
 
+    end_time = time.time()
+
+    print('\t\telapsed time: {}'.format(end_time - start_time))
     return jsonify(card_images)
 
 

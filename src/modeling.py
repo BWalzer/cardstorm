@@ -74,14 +74,14 @@ def upload_product_rdd(product_rdd):
     '''
     current_date = str(datetime.date.today())
 
-    cursor.execute('SELECT MAX(run_id) FROM product_matrices_v2')
+    cursor.execute('SELECT MAX(run_id) FROM product_matrices')
     run_id = cursor.fetchone()[0]
     if run_id is None:
         run_id = 0
     run_id += 1
 
     for cardstorm_id, features in product_rdd.toDF().collect():
-        query = '''INSERT INTO product_matrices_v2 (cardstorm_id, features, date, run_id)
+        query = '''INSERT INTO product_matrices (cardstorm_id, features, date, run_id)
                    VALUES (%s, %s, %s, %s)'''
 
         try:
@@ -142,10 +142,10 @@ def make_recommender():
 
 def main():
     global dbname, host, username, password, conn, cursor, spark
-    dbname = os.environ['CAPSTONE_DB_DBNAME']
-    host = os.environ['CAPSTONE_DB_HOST']
-    username = os.environ['CAPSTONE_DB_USERNAME']
-    password = os.environ['CAPSTONE_DB_PASSWORD']
+    dbname = os.environ['CARDSTORM_DB_DBNAME']
+    host = os.environ['CARDSTORM_DB_HOST']
+    username = os.environ['CARDSTORM_DB_USERNAME']
+    password = os.environ['CARDSTORM_DB_PASSWORD']
 
 
     conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname, host, username, password))

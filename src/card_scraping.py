@@ -185,10 +185,10 @@ def upload_card(card, cursor, verbose=False):
         return False
 
 def scrape_modern_cards(verbose=False):
-    hostname = os.environ['CAPSTONE_DB_HOST']
-    dbname = os.environ['CAPSTONE_DB_DBNAME']
-    username = os.environ['CAPSTONE_DB_USERNAME']
-    password = os.environ['CAPSTONE_DB_PASSWORD']
+    hostname = os.environ['CARDSTORM_DB_HOST']
+    dbname = os.environ['CARDSTORM_DB_DBNAME']
+    username = os.environ['CARDSTORM_DB_USERNAME']
+    password = os.environ['CARDSTORM_DB_PASSWORD']
 
     conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname, hostname, username, password))
     cursor = conn.cursor()

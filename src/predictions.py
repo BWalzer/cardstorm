@@ -12,10 +12,10 @@ class CardRecommender:
         self.all_cardstorm_ids = self.card_dict.get_cardstorm_ids()
 
     def _connect_to_db(self):
-        db_name = os.environ['CAPSTONE_DB_DBNAME']
-        db_host = os.environ['CAPSTONE_DB_HOST']
-        db_username = os.environ['CAPSTONE_DB_USERNAME']
-        db_password = os.environ['CAPSTONE_DB_PASSWORD']
+        db_name = os.environ['CARDSTORM_DB_DBNAME']
+        db_host = os.environ['CARDSTORM_DB_HOST']
+        db_username = os.environ['CARDSTORM_DB_USERNAME']
+        db_password = os.environ['CARDSTORM_DB_PASSWORD']
 
         self.conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(db_name, db_host, db_username, db_password))
         self.cursor = self.conn.cursor()
@@ -26,8 +26,8 @@ class CardRecommender:
         '''
 
         query = '''SELECT cardstorm_id, features
-                   FROM product_matrices_v2
-                   WHERE run_id = (SELECT MAX(run_id) FROM product_matrices_v2)
+                   FROM product_matrices
+                   WHERE run_id = (SELECT MAX(run_id) FROM product_matrices)
                    ORDER BY cardstorm_id ASC'''
         self.cursor.execute(query)
 
@@ -72,7 +72,10 @@ class CardRecommender:
         # print('raw: {}'.format(raw_deck_list))
 
         if raw_deck_list == '':
-            self.cursor.execute('SELECT cardstorm_id, SUM(card_count) FROM decks GROUP BY cardstorm_id ORDER BY sum DESC')
+            self.cursor.execute('''SELECT cardstorm_id, SUM(card_count)
+                                   FROM decks
+                                   GROUP BY cardstorm_id
+                                   ORDER BY sum DESC''')
             recommendations = [_[0] for _ in self.cursor.fetchall()]
         else:
             recommendations = self.all_cardstorm_ids[np.argsort(self.d_vector - self.deck_vector)[::-1]]
