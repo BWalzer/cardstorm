@@ -14,8 +14,9 @@ def scrape_images():
     hostname = os.environ['CARDSTORM_DB_HOST']
     dbname = os.environ['CARDSTORM_DB_DBNAME']
     username = os.environ['CARDSTORM_DB_USERNAME']
+    password = os.environ['CARDSTORM_DB_PASSWORD']
 
-    conn = psycopg2.connect('dbname={} host={} user={}'.format(dbname, hostname, username))
+    conn = psycopg2.connect('dbname={} host={} user={} password={}'.format(dbname, hostname, username, password))
     cursor = conn.cursor()
 
     s3 = boto3.client('s3')
