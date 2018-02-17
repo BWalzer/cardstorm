@@ -341,7 +341,9 @@ def modern_front_page_request(page_number=0, verbose=False):
     return response
 
 def scrape_decklists(front_pages=[0], verbose=False):
-    if verbose: print('BEGIN SCRAPING DECKS: {}'.format(str(datetime.datetime.today())))
+    if verbose:
+        print('#####################################################')
+        print('BEGIN SCRAPING DECKS: {}'.format(str(datetime.datetime.today())))
     global conn
     global cursor
     scraped_deck_ids = get_scraped_deck_ids()
