@@ -11,9 +11,9 @@ def scrape_images():
     Scrapes images for all cards in the cards db. saves to s3 bucket
     '''
 
-    hostname = os.environ['CAPSTONE_DB_HOST']
-    dbname = os.environ['CAPSTONE_DB_DBNAME']
-    username = os.environ['CAPSTONE_DB_USERNAME']
+    hostname = os.environ['cardstorm_DB_HOST']
+    dbname = os.environ['cardstorm_DB_DBNAME']
+    username = os.environ['cardstorm_DB_USERNAME']
 
     conn = psycopg2.connect('dbname={} host={} user={}'.format(dbname, hostname, username))
     cursor = conn.cursor()
