@@ -2,6 +2,7 @@ import requests
 import json
 import psycopg2
 import os
+import datetime
 
 def format_card(card):
     '''
@@ -185,6 +186,7 @@ def upload_card(card, cursor, verbose=False):
         return False
 
 def scrape_modern_cards(verbose=False):
+    if verbose: print('SCRAPING CARDS: {}'.format(datetime.datetime.today()))
     hostname = os.environ['CARDSTORM_DB_HOST']
     dbname = os.environ['CARDSTORM_DB_DBNAME']
     username = os.environ['CARDSTORM_DB_USERNAME']

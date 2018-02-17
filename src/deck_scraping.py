@@ -4,6 +4,7 @@ import numpy as np
 import json
 import random
 import time
+import datetime
 from bs4 import BeautifulSoup
 import psycopg2
 import os
@@ -340,6 +341,7 @@ def modern_front_page_request(page_number=0, verbose=False):
     return response
 
 def scrape_decklists(front_pages=[0], verbose=False):
+    if verbose: print('BEGIN SCRAPING DECKS: {}'.format(str(datetime.datetime.today())))
     global conn
     global cursor
     scraped_deck_ids = get_scraped_deck_ids()

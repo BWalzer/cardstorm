@@ -145,6 +145,7 @@ def make_recommender():
     if upload_status: conn.commit()
 
 def main():
+    print('BEGIN MODELING: {}'.format(datetime.datetime.today()))
     global dbname, host, username, password, conn, cursor, spark
     dbname = os.environ['CARDSTORM_DB_DBNAME']
     host = os.environ['CARDSTORM_DB_HOST']
