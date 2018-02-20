@@ -2,7 +2,7 @@
 export PYSPARK_DRIVER_PYTHON=
 export PYSPARK_DRIVER_PYTHON_OPTS=
 
-${SPARK_HOME}/bin/spark-submnit \
+/home/ubuntu/anaconda3/bin/spark-submit \
 --master local[4] \
 --executor-memory 1G \
 --driver-memory 1G \
