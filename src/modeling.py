@@ -22,7 +22,8 @@ def get_deck_card_counts(schema):
 
     incomplete_ratings = spark.createDataFrame(data=cursor.fetchall(),
                                                schema=schema)
-
+    print('##############################number of partitions')
+    print(incomplete_ratings.rdd.getNumPartitions())
     return incomplete_ratings
 
 def get_unused_cardstorm_ids():
