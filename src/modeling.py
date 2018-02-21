@@ -162,6 +162,7 @@ def main():
                    .appName('cardstorm modeling')
                    .getOrCreate())
 
+    spark.sparkContext.setLogLevel('WARN')
     make_recommender()
 
     conn.close()
