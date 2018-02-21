@@ -8,4 +8,4 @@
 /home/ubuntu/anaconda3/bin/python3 /home/ubuntu/cardstorm/src/deck_scraping.py 1>/home/ubuntu/cardstorm_logs/deck_stdout.log 2>/home/ubuntu/cardstorm_logs/deck_stderr.log
 
 # creates a new model
-/home/ubuntu/anaconda3/bin/python3 /home/ubuntu/cardstorm/scripts/modeling.sh
+bash /home/ubuntu/cardstorm/scripts/modeling.sh
