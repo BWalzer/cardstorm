@@ -25,7 +25,7 @@ def get_deck_card_counts(schema):
     print('############################## number of partitions')
     print(incomplete_ratings.rdd.getNumPartitions())
 
-    incomplete_ratings_rdd = incomplete_ratings.rdd.repartition(300)
+    incomplete_ratings_rdd = incomplete_ratings.rdd.repartition(1000)
     incomplete_ratings = spark.createDataFrame(incomplete_ratings_rdd,
                                                schema=schema)
     print('############################## number of partitions')
