@@ -7,7 +7,6 @@ Magic: the Gathering was the first trading card game, and since it's creation in
 While Magic started as a quick game to play alongside other games, a competitive scene was quickly established. Because new cards are released frequently, players must change their decks to adapt to the new cards and decks that their opponents will play. As a consequence of the fast changing meta-game, it's easy to get left behind in your deck building choices.
 
 [cardstorm](http://www.cardstorm.me) is a web app for Magic: the Gathering players looking for cards to include in their deck. The user inputs list of cards or an incomplete deck list, and recommendations are made for cards to add to their deck. These recommendations are made based on top placing deck lists from tournaments around the world.
-***
 
 ## How it works
 Each of these steps are performed independently, on an Amazon EC2 instance and interface only with an Amazon RDS PostgreSQL database.
