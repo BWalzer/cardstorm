@@ -151,8 +151,8 @@ def upload_user_card_counts(user_card_counts, verbose=False):
     try:
         cursor.execute(query=query, vars=user_card_counts)
 
-    except psycopg2.IntegrityError:
-        if verbose: print('            duplicate key: deck not added to db')
+    except psycopg2.IntegrityError as error:
+        if verbose: print('            {}'.format(error))
         return False
 
     return True
@@ -392,7 +392,7 @@ def main():
 
     card_dict = ReflexiveDict()
 
-    scrape_decklists(verbose=True, front_pages=range(5))
+    scrape_decklists(verbose=True, front_pages=range(10))
 
 
 if __name__ == '__main__':
