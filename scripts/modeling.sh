@@ -1,5 +1,6 @@
 #!/bin/bash
-export PYSPARK_DRIVER_PYTHON=
+export PYSPARK_DRIVER_PYTHON=/home/ubuntu/anaconda3/bin/python
+export PYSPARK_PYTHON=/home/ubuntu/anaconda3/bin/python
 export PYSPARK_DRIVER_PYTHON_OPTS=
 
 /home/ubuntu/anaconda3/bin/spark-submit \
