@@ -39,7 +39,7 @@ the vector `d`, a least-squares solver is used to find `u`, the solution to the 
 Recommendations by multiplying `u•V = d'` and taking the difference between `d` and `d'`. 
 ![Step 4](https://github.com/BWalzer/cardstorm/blob/master/images/matrix_step4.png "Step 4")
 The images corresponding to the top 10 recommendations are loaded from an s3 bucket.
-![Ouput](https://github.com/BWalzer/cardstorm/blob/master/images/ouput.png "Output")
+![Ouput](https://github.com/BWalzer/cardstorm/blob/master/images/output.png "Output")
 
 
 
