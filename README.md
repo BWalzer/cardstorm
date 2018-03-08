@@ -11,6 +11,8 @@ While Magic started as a quick game to play alongside other games, a competitive
 ## How it works
 Each of these steps are performed independently, on an Amazon EC2 instance and interface only with an Amazon RDS PostgreSQL database.
 
+![Work Flow](https://github.com/BWalzer/cardstorm/blob/master/images/work_flow.png "Work Flow")
+
 1. Using [scryfall](https://scryfall.com)'s API, a table of all Modern-legal cards is created in the PostgreSQL database. A new unique identifier is created, as there are various problems with previous unique identifiers. 
 
 	The table of cards is updated daily, before new deck lists are scraped.
@@ -22,11 +24,22 @@ Each of these steps are performed independently, on an Amazon EC2 instance and i
 	* A deck including 4 copies of card A and 2 copies of card B does not mean card A is better than card B.
 	* A deck not including a card in a deck does not mean the card was not wanted in the deck, the price of the card and the availability of the card are two examples of factors contributing to the number of copies included.
 
-	The matrix factorization splits the original matrix `D` into two matrices `U, V`, where `D ~ U•V`. Normal matrix factorization models would then use `U` and `V` to get estimated ratings for un-rated items in `D`. Because one of the goals of cardstorm is to make recommendations quickly, the `V` matrix is stored in the PostgreSQL database for later use.
-   
+	The matrix factorization splits the original matrix `D` into two matrices `U, V`, where `D ~ U•V`. 
+	![Step 1](https://github.com/BWalzer/cardstorm/blob/master/images/matrix_step1.png "Step 1")
+	
+	Normal matrix factorization models would then use `U` and `V` to get estimated ratings for un-rated items in `D`. Because one of the goals of cardstorm is to make recommendations quickly, the `V` matrix is stored in the PostgreSQL database for later use.
+	![Step 2](https://github.com/BWalzer/cardstorm/blob/master/images/matrix_step2.png "Step 2")
+    
    The modeling process is performed daily, after new deck lists are scraped.
    
-4. Flask is used to host the web app. When a user submits a list of cards to the web app, the vector `d`, a least-squares solver is used to find `u`, the solution to the system `d = u•V`. Recommendations by multiplying `u•V = d'` and taking the difference between `d` and `d'`. The images corresponding to the top 10 recommendations are loaded from an s3 bucket.
+4. Flask is used to host the web app. When a user submits a list of cards to the web app, 
+![User Submission](https://github.com/BWalzer/cardstorm/blob/master/images/sample_cards.png "User Submission")
+the vector `d`, a least-squares solver is used to find `u`, the solution to the system `d = u•V`.
+![Step 3](https://github.com/BWalzer/cardstorm/blob/master/images/matrix_step3.png "Step 3")
+Recommendations by multiplying `u•V = d'` and taking the difference between `d` and `d'`. 
+![Step 4](https://github.com/BWalzer/cardstorm/blob/master/images/matrix_step4.png "Step 4")
+The images corresponding to the top 10 recommendations are loaded from an s3 bucket.
+![Ouput](https://github.com/BWalzer/cardstorm/blob/master/images/ouput.png "Output")
 
 
 
